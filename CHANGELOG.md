@@ -2,6 +2,12 @@
 
 All notable changes to the **Antigravity Auto Run Pro** extension will be documented in this file.
 
+## [1.3.1] - 2026-02-21
+
+### Changed
+- Added missing SEO keywords to `package.json` and `README.md` to ensure correct indexing on the VS Marketplace and Open VSX ("auto run command", "auto pilot", "auto accept", "free auto accept agent").
+
+
 ## [1.3.0] - 2026-02-21
 
 ### Fixed

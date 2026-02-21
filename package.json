@@ -4,14 +4,13 @@
     "description": "Seamlessly accept all Antigravity agent steps and terminal commands without limits.",
     "keywords": [
         "antigravity",
-        "auto run",
+        "auto run command",
+        "auto pilot",
         "auto accept",
-        "automation",
-        "ai",
-        "agent",
-        "scripting"
+        "free auto accept agent",
+        "automation"
     ],
-    "version": "1.3.0",
+    "version": "1.3.1",
     "icon": "icon.png",
     "publisher": "marcodelia",
     "author": "Marco D'Elia",

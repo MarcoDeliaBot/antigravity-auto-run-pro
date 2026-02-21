@@ -1,8 +1,8 @@
 # Antigravity Auto Run Pro
 
-Welcome to the ultimate solution for hands-free automation in your IDE! **Antigravity Auto Run Pro** automatically accepts Antigravity agent steps without limits, allowing you to streamline your development workflow and focus purely on the results.
+Welcome to the ultimate solution for hands-free automation in your IDE! **Antigravity Auto Run Pro** acts as an **auto pilot**, serving as your **free auto accept agent**. It automatically fires the **auto run command** and utilizes **auto accept** logic for all Antigravity agent steps without limits, allowing you to streamline your development workflow and focus purely on the results.
 
-This is the premium rebuilt version designed specifically to work seamlessly with zero conflicts starting from IDE version 1.18.4+. If you are tired of clicking "Accept" or "Run" repeatedly, **Antigravity Auto Run Pro** is exactly what you need.
+This is the premium rebuilt version designed specifically to work seamlessly with zero conflicts starting from IDE version 1.18.4+. If you are tired of clicking "Accept" or "Run" repeatedly, our advanced **auto pilot** is exactly what you need.
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?style=for-the-badge&logo=github)](https://github.com/sponsors/MarcoDeliaBot)
 
