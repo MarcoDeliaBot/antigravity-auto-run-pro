@@ -3,6 +3,8 @@
 Automatically accepts Antigravity agent steps without limits.
 Premium rebuilt version with zero conflicts for IDE version 1.18.4+.
 
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?style=for-the-badge&logo=github)](https://github.com/sponsors/MarcoDeliaBot)
+
 ## Features
 - Seamless background auto-accept
 - Terminal commands execution bypass (`antigravity.terminalCommand.run`)
