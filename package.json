@@ -6,6 +6,10 @@
     "icon": "icon.png",
     "publisher": "marcodelia",
     "author": "Marco D'Elia",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/MarcoDeliaBot/antigravity-auto-run-pro.git"
+    },
     "engines": {
         "vscode": "^1.60.0"
     },
