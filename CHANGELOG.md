@@ -5,7 +5,7 @@ All notable changes to the **Antigravity Auto Run Pro** extension will be docume
 ## [1.2.0] - 2026-02-21
 
 ### Added
-- Aggiunto supporto nativo ai testi in italiano ("Esegui", "Accetta", "Consenti", ecc.) per il modulo CDP, in modo da riconoscere automaticamente il prompt delle autorizzazioni sulle versioni localizzate dell'IDE.
+- Added native support for localized Italian texts ("Esegui", "Accetta", "Consenti", etc.) for the CDP module, to automatically recognize permission prompts on localized IDE versions.
 
 ## [1.0.0] - 2026-02-21
 
