@@ -1,0 +1,37 @@
+{
+    "name": "antigravity-auto-run-pro",
+    "displayName": "Antigravity Auto Run Pro",
+    "description": "Seamlessly accept all Antigravity agent steps and terminal commands without limits.",
+    "version": "1.2.0",
+    "icon": "icon.png",
+    "publisher": "marcodelia",
+    "author": "Marco D'Elia",
+    "engines": {
+        "vscode": "^1.60.0"
+    },
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "main": "./extension.js",
+    "categories": [
+        "Other"
+    ],
+    "dependencies": {
+        "ws": "^8.13.0"
+    },
+    "contributes": {
+        "commands": [
+            {
+                "command": "autorunpro.toggle",
+                "title": "Toggle Auto Run Pro"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "autorunpro.toggle",
+                "key": "ctrl+alt+shift+r",
+                "mac": "cmd+alt+shift+r"
+            }
+        ]
+    }
+}
