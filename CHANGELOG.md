@@ -2,6 +2,26 @@
 
 All notable changes to the **Antigravity Auto Run Pro** extension will be documented in this file.
 
+## [1.3.0] - 2026-02-21
+
+### Fixed
+- Critical fix: CDP button matching now uses **direct text** instead of full `textContent` to prevent false positives. Previously, "run" would match the IDE's "Run" menu, extension names like "Test Runner for Java", and other unrelated elements.
+- Added strict `textMatches()` function that only allows exact matches or known suffixed patterns (e.g. "Run Alt+D", "Accept All").
+- Short button texts (≤4 chars like "run") now only match on direct text nodes, not descendant text.
+
+### Changed
+- Completely rewritten `cdp_debug.js` with cleaner output, agent-panel filtering, and structured button reporting.
+
+## [1.2.2] - 2026-02-21
+
+### Changed
+- Major SEO update for the Visual Studio Marketplace. Added keywords and completely rewrote the README.md to ensure the exact phrase "Antigravity Auto Run Pro" and related terms are indexed correctly by search engines.
+
+## [1.2.1] - 2026-02-21
+
+### Changed
+- Updated the extension logo with a new minimal, light-themed design.
+
 ## [1.2.0] - 2026-02-21
 
 ### Added

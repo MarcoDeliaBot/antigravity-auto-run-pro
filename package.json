@@ -2,7 +2,16 @@
     "name": "antigravity-auto-run-pro",
     "displayName": "Antigravity Auto Run Pro",
     "description": "Seamlessly accept all Antigravity agent steps and terminal commands without limits.",
-    "version": "1.2.0",
+    "keywords": [
+        "antigravity",
+        "auto run",
+        "auto accept",
+        "automation",
+        "ai",
+        "agent",
+        "scripting"
+    ],
+    "version": "1.3.0",
     "icon": "icon.png",
     "publisher": "marcodelia",
     "author": "Marco D'Elia",

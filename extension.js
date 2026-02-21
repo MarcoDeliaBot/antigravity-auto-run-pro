@@ -1,4 +1,4 @@
-// AntiGravity AutoAccept v1.18.3
+// AntiGravity AutoAccept v1.3.0
 // Primary: VS Code Commands API with async lock
 // Secondary: Shadow DOM-piercing CDP for permission & action buttons
 
@@ -48,6 +48,19 @@ function buildPermissionScript(customTexts) {
     // We are safely inside the isolated agent panel webview.
     // document.body IS the agent panel — no iframe needed.
     
+    // ═══ STRICT TEXT EXTRACTION ═══
+    // Get only DIRECT text of a node (not descendant text)
+    // This prevents matching "run" inside "Test Runner for Java" etc.
+    function getDirectText(node) {
+        var text = '';
+        for (var i = 0; i < node.childNodes.length; i++) {
+            if (node.childNodes[i].nodeType === 3) { // TEXT_NODE
+                text += node.childNodes[i].textContent;
+            }
+        }
+        return text.trim().toLowerCase();
+    }
+    
     function closestClickable(node) {
         var el = node;
         while (el && el !== document.body) {
@@ -62,6 +75,22 @@ function buildPermissionScript(customTexts) {
         return node;
     }
     
+    // ═══ STRICT MATCH ═══
+    // Match button text strictly: exact match, or known prefix patterns
+    // like "run alt+d", "accept all", "esegui alt+d"
+    function textMatches(nodeText, target) {
+        if (nodeText === target) return true;
+        // Allow "run alt+..." or "esegui alt+..." (keyboard shortcut suffix)
+        if (nodeText.startsWith(target + ' alt+')) return true;
+        if (nodeText.startsWith(target + ' ctrl+')) return true;
+        // Allow "accept all" for target "accept"
+        if (target === 'accept' && (nodeText === 'accept all' || nodeText.startsWith('accept all'))) return true;
+        if (target === 'accetta' && (nodeText === 'accetta tutto' || nodeText.startsWith('accetta tutto'))) return true;
+        // Longer targets (3+ chars) can use startsWith for multi-word buttons
+        if (target.length >= 6 && nodeText.startsWith(target)) return true;
+        return false;
+    }
+    
     function findButton(root, text) {
         var walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
         var node;
@@ -70,6 +99,7 @@ function buildPermissionScript(customTexts) {
                 var result = findButton(node.shadowRoot, text);
                 if (result) return result;
             }
+            // Check data-testid / data-action for permission buttons
             var testId = (node.getAttribute('data-testid') || node.getAttribute('data-action') || '').toLowerCase();
             if (testId.includes('alwaysallow') || testId.includes('always-allow') || testId.includes('allow')) {
                 var tag1 = (node.tagName || '').toLowerCase();
@@ -77,8 +107,16 @@ function buildPermissionScript(customTexts) {
                     return node;
                 }
             }
-            var nodeText = (node.textContent || '').trim().toLowerCase();
-            if (nodeText === text || (text.length >= 3 && nodeText.startsWith(text))) {
+            // ═══ USE DIRECT TEXT instead of full textContent ═══
+            // This is the key fix: prevents matching "run" inside
+            // "Test Runner for Java" or the IDE "Run" menu
+            var directText = getDirectText(node);
+            var fullText = (node.textContent || '').trim().toLowerCase();
+            // For short targets like 'run', use DIRECT text only
+            // For longer targets, allow full textContent as fallback
+            var checkText = text.length <= 4 ? directText : (directText || fullText.substring(0, 40));
+            
+            if (textMatches(checkText, text)) {
                 var clickable = closestClickable(node);
                 var tag2 = (clickable.tagName || '').toLowerCase();
                 if (tag2 === 'button' || tag2.includes('button') || clickable.getAttribute('role') === 'button' || 
@@ -475,7 +513,7 @@ function applyTemporarySessionRestart() {
 // ─── Activation ───────────────────────────────────────────────────────
 function activate(context) {
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.18.3)');
+    log('Extension activating (v1.3.0)');
 
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     statusBarItem.command = 'autorunpro.toggle';
