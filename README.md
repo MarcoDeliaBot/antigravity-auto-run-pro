@@ -17,6 +17,20 @@ Finding the right automation tool is crucial. **Antigravity Auto Run Pro** was b
 - **100% Reliability**: Rock-solid background processes that never miss a prompt.
 - **Localized OS Support**: Supports native button prompts across all IDE localizations (English, Italian, etc.).
 - **Easy Toggle Switch**: Activate or deactivate **Antigravity Auto Run Pro** on-the-fly using the bottom-right status bar icon, or the `Ctrl+Alt+Shift+R` (`Cmd+Alt+Shift+R` on Mac) shortcut.
+- **God Mode (Optional)**: When enabled, also auto-accepts parent folder access prompts (`Allow`, `Always Allow`, `Consenti`). **Disabled by default for safety.** Toggle via the `$(flame) GOD` status bar icon or `Ctrl+Alt+Shift+G`.
+
+## God Mode ⚠️
+
+By default, **Antigravity Auto Run Pro** does NOT auto-accept prompts that grant the agent access to files outside your workspace. This is a safety measure — AI agents can sometimes delete or modify files in unexpected locations.
+
+If you want full, unattended automation (including folder access prompts), you can enable **God Mode**:
+
+1. Click the `$(shield) Safe` icon in the status bar, or
+2. Use the shortcut `Ctrl+Alt+Shift+G` (`Cmd+Alt+Shift+G` on Mac), or
+3. Run `Toggle God Mode (Auto Run Pro)` from the Command Palette, or
+4. Set `autorunpro.godMode` to `true` in VS Code Settings.
+
+> ⚠️ **Warning**: Enabling God Mode lets the agent access files outside your workspace without asking for confirmation. Use at your own risk.
 
 ## Usage
 

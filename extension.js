@@ -1,4 +1,4 @@
-// AntiGravity AutoAccept v1.3.0
+// AntiGravity AutoAccept v1.4.0
 // Primary: VS Code Commands API with async lock
 // Secondary: Shadow DOM-piercing CDP for permission & action buttons
 
@@ -21,19 +21,31 @@ const ACCEPT_COMMANDS = [
 // Uses a Webview Guard to prevent execution on the main VS Code window.
 // The agent panel runs in an isolated Chromium process (OOPIF) since
 // VS Code's migration to Out-Of-Process Iframes.
-function buildPermissionScript(customTexts) {
-    const allTexts = [
-        'run', 'accept',  // Primary action buttons first ("Run Alt+d", "Accept")
-        'esegui', 'accetta', // Italian
-        'always allow', 'allow this conversation', 'allow',
-        'consenti sempre', 'consenti in questa conversazione', 'consenti',
-        'continue', 'proceed',
-        'continua', 'procedi',
-        ...customTexts
-    ];
+
+// Safe texts: always auto-accepted (run/accept terminal commands)
+const SAFE_TEXTS = [
+    'run', 'accept',  // Primary action buttons first ("Run Alt+d", "Accept")
+    'esegui', 'accetta', // Italian
+    'continue', 'proceed',
+    'continua', 'procedi',
+];
+
+// Unsafe texts: only auto-accepted in God Mode (parent folder access)
+// ⚠️ These grant the agent access to files outside the workspace
+const UNSAFE_TEXTS = [
+    'always allow', 'allow this conversation', 'allow',
+    'consenti sempre', 'consenti in questa conversazione', 'consenti',
+];
+
+function buildPermissionScript(customTexts, godMode) {
+    const allTexts = godMode
+        ? [...SAFE_TEXTS, ...UNSAFE_TEXTS, ...customTexts]
+        : [...SAFE_TEXTS, ...customTexts];
+    // Pass godMode flag into the script so data-testid checks are conditional
     return `
 (function() {
     var BUTTON_TEXTS = ${JSON.stringify(allTexts)};
+    var GOD_MODE = ${godMode ? 'true' : 'false'};
     
     // ═══ WEBVIEW GUARD ═══
     // Check for Antigravity agent panel DOM markers.
@@ -100,11 +112,14 @@ function buildPermissionScript(customTexts) {
                 if (result) return result;
             }
             // Check data-testid / data-action for permission buttons
-            var testId = (node.getAttribute('data-testid') || node.getAttribute('data-action') || '').toLowerCase();
-            if (testId.includes('alwaysallow') || testId.includes('always-allow') || testId.includes('allow')) {
-                var tag1 = (node.tagName || '').toLowerCase();
-                if (tag1 === 'button' || tag1.includes('button') || node.getAttribute('role') === 'button' || tag1.includes('btn')) {
-                    return node;
+            // ═══ GOD MODE GUARD: only match allow-related data-testid in God Mode ═══
+            if (GOD_MODE) {
+                var testId = (node.getAttribute('data-testid') || node.getAttribute('data-action') || '').toLowerCase();
+                if (testId.includes('alwaysallow') || testId.includes('always-allow') || testId.includes('allow')) {
+                    var tag1 = (node.tagName || '').toLowerCase();
+                    if (tag1 === 'button' || tag1.includes('button') || node.getAttribute('role') === 'button' || tag1.includes('btn')) {
+                        return node;
+                    }
                 }
             }
             // ═══ USE DIRECT TEXT instead of full textContent ═══
@@ -145,9 +160,11 @@ function buildPermissionScript(customTexts) {
 
 let isEnabled = false;
 let isAccepting = false; // Async lock — prevents double-accepts
+let isGodMode = false;   // God Mode — also auto-accept folder access prompts
 let pollIntervalId = null;
 let cdpIntervalId = null;
 let statusBarItem = null;
+let godModeStatusBarItem = null;
 let outputChannel = null;
 
 function log(msg) {
@@ -166,6 +183,21 @@ function updateStatusBar() {
         statusBarItem.text = '$(circle-slash) Auto: OFF';
         statusBarItem.backgroundColor = undefined;
         statusBarItem.tooltip = 'AntiGravity AutoAccept is OFF — click to enable';
+    }
+}
+
+function updateGodModeStatusBar() {
+    if (!godModeStatusBarItem) return;
+    if (isGodMode) {
+        godModeStatusBarItem.text = '$(flame) GOD';
+        godModeStatusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
+        godModeStatusBarItem.tooltip = '⚠️ God Mode ACTIVE — auto-accepting folder access prompts. Click to disable.';
+        godModeStatusBarItem.show();
+    } else {
+        godModeStatusBarItem.text = '$(shield) Safe';
+        godModeStatusBarItem.backgroundColor = undefined;
+        godModeStatusBarItem.tooltip = 'God Mode OFF — folder access prompts require manual approval. Click to enable.';
+        godModeStatusBarItem.show();
     }
 }
 
@@ -329,7 +361,7 @@ async function checkPermissionButtons() {
     if (!isEnabled) return;
     const config = vscode.workspace.getConfiguration('autorunpro');
     const customTexts = config.get('customButtonTexts', []);
-    const script = buildPermissionScript(customTexts);
+    const script = buildPermissionScript(customTexts, isGodMode);
     try {
         for (const port of CDP_PORTS) {
             try {
@@ -513,12 +545,23 @@ function applyTemporarySessionRestart() {
 // ─── Activation ───────────────────────────────────────────────────────
 function activate(context) {
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.3.1)');
+    log('Extension activating (v1.4.0)');
 
+    // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     statusBarItem.command = 'autorunpro.toggle';
     context.subscriptions.push(statusBarItem);
     statusBarItem.show();
+
+    // God Mode status bar item (shown next to main toggle)
+    godModeStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
+    godModeStatusBarItem.command = 'autorunpro.toggleGodMode';
+    context.subscriptions.push(godModeStatusBarItem);
+
+    // Restore God Mode state from settings and persisted state
+    const config = vscode.workspace.getConfiguration('autorunpro');
+    isGodMode = config.get('godMode', false) || context.globalState.get('autorunproGodMode', false);
+    updateGodModeStatusBar();
 
     context.subscriptions.push(
         vscode.commands.registerCommand('autorunpro.toggle', () => {
@@ -530,6 +573,25 @@ function activate(context) {
             vscode.window.showInformationMessage(
                 `AntiGravity AutoAccept: ${isEnabled ? 'ENABLED ⚡' : 'DISABLED 🔴'}`
             );
+        })
+    );
+
+    // God Mode toggle command
+    context.subscriptions.push(
+        vscode.commands.registerCommand('autorunpro.toggleGodMode', () => {
+            isGodMode = !isGodMode;
+            log(`God Mode: ${isGodMode ? 'ON ⚠️' : 'OFF'}`);
+            updateGodModeStatusBar();
+            context.globalState.update('autorunproGodMode', isGodMode);
+            if (isGodMode) {
+                vscode.window.showWarningMessage(
+                    '⚠️ God Mode ENABLED — folder access prompts will be auto-accepted. The agent can now access files outside your workspace.'
+                );
+            } else {
+                vscode.window.showInformationMessage(
+                    '🛡️ God Mode DISABLED — folder access prompts require manual approval.'
+                );
+            }
         })
     );
 

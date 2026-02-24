@@ -2,6 +2,18 @@
 
 All notable changes to the **Antigravity Auto Run Pro** extension will be documented in this file.
 
+## [1.4.0] - 2026-02-24
+
+### Added
+- **God Mode**: new optional mode (disabled by default) that also auto-accepts parent folder access prompts (Allow, Always Allow, Consenti). Toggle via status bar icon, command palette (`Toggle God Mode`), or `Ctrl+Alt+Shift+G`.
+- Dedicated status bar indicator: `$(flame) GOD` (red) when active, `$(shield) Safe` when off.
+- New setting `autorunpro.godMode` in VS Code settings.
+- Formal `contributes.configuration` section in `package.json` for `godMode`, `pollInterval`, and `customButtonTexts`.
+
+### Changed
+- CDP permission script now separates button texts into **safe** (run/accept) and **unsafe** (allow/consenti). Unsafe texts are only matched when God Mode is enabled.
+- `data-testid` checks for `allow`/`alwaysallow` are now conditional on God Mode.
+
 ## [1.3.1] - 2026-02-21
 
 ### Changed

@@ -10,7 +10,7 @@
         "free auto accept agent",
         "automation"
     ],
-    "version": "1.3.1",
+    "version": "1.4.0",
     "icon": "icon.png",
     "publisher": "marcodelia",
     "author": "Marco D'Elia",
@@ -36,6 +36,10 @@
             {
                 "command": "autorunpro.toggle",
                 "title": "Toggle Auto Run Pro"
+            },
+            {
+                "command": "autorunpro.toggleGodMode",
+                "title": "Toggle God Mode (Auto Run Pro)"
             }
         ],
         "keybindings": [
@@ -43,7 +47,35 @@
                 "command": "autorunpro.toggle",
                 "key": "ctrl+alt+shift+r",
                 "mac": "cmd+alt+shift+r"
+            },
+            {
+                "command": "autorunpro.toggleGodMode",
+                "key": "ctrl+alt+shift+g",
+                "mac": "cmd+alt+shift+g"
             }
-        ]
+        ],
+        "configuration": {
+            "title": "Antigravity Auto Run Pro",
+            "properties": {
+                "autorunpro.godMode": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "⚠️ God Mode: auto-accept parent folder access prompts (Allow, Always Allow, Consenti). DISABLED by default for safety — enabling this lets the agent access files outside your workspace without confirmation."
+                },
+                "autorunpro.pollInterval": {
+                    "type": "number",
+                    "default": 500,
+                    "description": "Polling interval in milliseconds for auto-accept checks."
+                },
+                "autorunpro.customButtonTexts": {
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Additional button texts to auto-click in the agent panel."
+                }
+            }
+        }
     }
 }
