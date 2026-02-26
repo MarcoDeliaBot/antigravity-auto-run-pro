@@ -2,6 +2,16 @@
 
 All notable changes to the **Antigravity Auto Run Pro** extension will be documented in this file.
 
+## [1.4.1] - 2026-02-26
+
+### Added
+- Added **"Allow Once"** and **"Consenti una volta"** to `SAFE_TEXTS`, enabling auto-accept of browser domain permission prompts (e.g. "Agent needs permission to act on example.com") without requiring God Mode.
+
+### Fixed
+- Browser domain permission prompts were previously not auto-accepted at all (the "Allow Once" text was missing from all button lists).
+
+---
+
 ## [1.4.0] - 2026-02-24
 
 ### Added

@@ -1,4 +1,4 @@
-// AntiGravity AutoAccept v1.4.0
+// AntiGravity AutoAccept v1.4.1
 // Primary: VS Code Commands API with async lock
 // Secondary: Shadow DOM-piercing CDP for permission & action buttons
 
@@ -28,6 +28,7 @@ const SAFE_TEXTS = [
     'esegui', 'accetta', // Italian
     'continue', 'proceed',
     'continua', 'procedi',
+    'allow once', 'consenti una volta', // Browser domain permission prompts
 ];
 
 // Unsafe texts: only auto-accepted in God Mode (parent folder access)
@@ -545,7 +546,7 @@ function applyTemporarySessionRestart() {
 // ─── Activation ───────────────────────────────────────────────────────
 function activate(context) {
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.4.0)');
+    log('Extension activating (v1.4.1)');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
