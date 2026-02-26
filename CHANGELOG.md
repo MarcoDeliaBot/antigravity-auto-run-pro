@@ -1,3 +1,8 @@
+## [1.4.2] - 2026-02-26
+
+### Added
+- Aggiunto logging avanzato degli errori (con anti-spam/throttling) per diagnosticare mancati click CDP e rifiuti dei comandi VS Code
+
 # Changelog
 
 All notable changes to the **Antigravity Auto Run Pro** extension will be documented in this file.
@@ -62,3 +67,4 @@ All notable changes to the **Antigravity Auto Run Pro** extension will be docume
 - New isolated bundle and command structure to prevent collisions.
 - Integrates all new accept commands for Antigravity IDE v1.18.4+ (`antigravity.terminalCommand.run`, `antigravity.terminalCommand.accept`, etc.).
 - Premium responsive status bar icon and brand new neon lock logo.
+

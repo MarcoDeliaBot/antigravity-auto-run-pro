@@ -174,6 +174,16 @@ function log(msg) {
     }
 }
 
+// Throttled logging to avoid spamming the console every 500ms when an error persists
+let lastLogTimes = {};
+function logThrottled(key, msg, throttleMs = 30000) {
+    const now = Date.now();
+    if (!lastLogTimes[key] || now - lastLogTimes[key] > throttleMs) {
+        log(msg);
+        lastLogTimes[key] = now;
+    }
+}
+
 function updateStatusBar() {
     if (!statusBarItem) return;
     if (isEnabled) {
@@ -363,13 +373,19 @@ async function checkPermissionButtons() {
     const config = vscode.workspace.getConfiguration('autorunpro');
     const customTexts = config.get('customButtonTexts', []);
     const script = buildPermissionScript(customTexts, isGodMode);
+    let cdpAttempted = false;
+    let anyConnected = false;
+
     try {
         for (const port of CDP_PORTS) {
             try {
                 const pages = await cdpGetPages(port);
+                anyConnected = true;
                 if (pages.length === 0) continue;
+                cdpAttempted = true;
+
                 // Evaluate on all targets — the Webview Guard inside the script
-                // handles isolation (non-webview targets return 'ignored-main-window')
+                // handles isolation (non-webview targets return 'not-agent-panel')
                 for (let i = 0; i < pages.length; i++) {
                     try {
                         const result = await cdpEvaluate(pages[i].webSocketDebuggerUrl, script);
@@ -377,12 +393,24 @@ async function checkPermissionButtons() {
                             log(`[CDP] ✓ ${result}`);
                             return;
                         }
-                    } catch (e) { /* next webview */ }
+                    } catch (e) {
+                        logThrottled('cdp-eval-error', `[CDP] ⚠️ Eval error on port ${port}: ${e.message}`, 60000);
+                    }
                 }
-                return;
-            } catch (e) { /* next port */ }
+                return; // Found the correct connected port, stop scanning other ports
+            } catch (e) { /* port not open, next port */ }
         }
-    } catch (e) { /* silent */ }
+
+        // If we reach here, we exhausted all ports
+        if (!anyConnected) {
+            logThrottled('cdp-no-connect', '[CDP] 🔴 Could not connect to any CDP port. Is Debug Mode disabled?', 60000);
+        } else if (!cdpAttempted) {
+            logThrottled('cdp-no-pages', '[CDP] ⚠️ Connected to Debug port, but no webview targets found.', 60000);
+        }
+
+    } catch (e) {
+        logThrottled('cdp-fatal', `[CDP] 🔴 Fatal error in polling: ${e.message}`, 60000);
+    }
 }
 
 // ─── Polling with Async Lock ──────────────────────────────────────────
@@ -398,9 +426,22 @@ function startPolling() {
         if (!isEnabled || isAccepting) return;
         isAccepting = true;
         try {
-            await Promise.allSettled(
+            const results = await Promise.allSettled(
                 ACCEPT_COMMANDS.map(cmd => vscode.commands.executeCommand(cmd))
             );
+
+            // Log real errors safely
+            results.forEach((res, idx) => {
+                if (res.status === 'rejected') {
+                    const errMsg = (res.reason && res.reason.message) ? res.reason.message : String(res.reason);
+                    // Silently ignore expected "command not found" or context-unavailing errors
+                    if (!errMsg.toLowerCase().includes('not found') && !errMsg.toLowerCase().includes('not enabled')) {
+                        logThrottled(`vs-cmd-${idx}`, `[VSCode API] ⚠️ Cmd ${ACCEPT_COMMANDS[idx]} rejected: ${errMsg}`);
+                    }
+                }
+            });
+        } catch (e) {
+            logThrottled('vs-cmd-fatal', `[VSCode API] 🔴 Fatal polling error: ${(e && e.message) ? e.message : String(e)}`);
         } finally {
             isAccepting = false;
         }
@@ -546,7 +587,7 @@ function applyTemporarySessionRestart() {
 // ─── Activation ───────────────────────────────────────────────────────
 function activate(context) {
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.4.1)');
+    log('Extension activating (v1.4.2)');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
