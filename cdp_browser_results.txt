@@ -1,0 +1,14 @@
+﻿Browser info: {
+  "Browser": "Chrome/142.0.7444.175",
+  "Protocol-Version": "1.3",
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Antigravity/1.107.0 Chrome/142.0.7444.175 Electron/39.2.3 Safari/537.36",
+  "V8-Version": "14.2.231.21",
+  "WebKit-Version": "537.36 (@caff226ed96db00961b7046a5dc9f8db004e7fbb)",
+  "webSocketDebuggerUrl": "ws://127.0.0.1:9222/devtools/browser/064b26c1-ce41-42fb-bff4-fb3b5e829a5d"
+}
+Browser WS URL: ws://127.0.0.1:9222/devtools/browser/064b26c1-ce41-42fb-bff4-fb3b5e829a5d
+
+Found 0 Manager targets:
+
+All jetski targets: 1
+  - Settings (5C5A8E992EA0092D6844B0959D6BBECE) type=page

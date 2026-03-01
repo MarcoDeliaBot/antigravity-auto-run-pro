@@ -1,0 +1,110 @@
+﻿{
+  "agentElements": [
+    {
+      "tag": "A",
+      "id": "",
+      "classes": "open-agent-manager-button",
+      "childCount": 1,
+      "textPreview": "Open Agent Manager"
+    },
+    {
+      "tag": "DIV",
+      "id": "",
+      "classes": "antigravity-agent-side-panel",
+      "childCount": 1,
+      "textPreview": "Agent Manager CDP InvestigationCustomizationMCP ServersExportThought for 47s\n/* Copied from remark-g"
+    }
+  ],
+  "totalButtons": 79,
+  "allButtonTexts": [
+    "antigravity-auto-run-pro",
+    "Outline",
+    "Timeline",
+    "Review",
+    "Submit",
+    "Agent",
+    "main*",
+    "0  0",
+    "Antigravity - Settings",
+    "GOD",
+    "Auto: ON",
+    "Thought for 47s",
+    "Relocate",
+    "Always run",
+    "Cancel",
+    "Collapse all",
+    "Review Changes",
+    "Planning",
+    "Claude Opus 4.6 (Thinking)"
+  ],
+  "chatElements": [
+    {
+      "tag": "DIV",
+      "id": "",
+      "classes": "empty-pane-message-area",
+      "childCount": 1
+    },
+    {
+      "tag": "DIV",
+      "id": "",
+      "classes": "empty-pane-message",
+      "childCount": 0
+    },
+    {
+      "tag": "DIV",
+      "id": "",
+      "classes": "empty-pane-message-area",
+      "childCount": 1
+    },
+    {
+      "tag": "DIV",
+      "id": "",
+      "classes": "empty-pane-message",
+      "childCount": 0
+    },
+    {
+      "tag": "DIV",
+      "id": "",
+      "classes": "empty-pane-message-area",
+      "childCount": 1
+    },
+    {
+      "tag": "DIV",
+      "id": "",
+      "classes": "empty-pane-message",
+      "childCount": 0
+    },
+    {
+      "tag": "DIV",
+      "id": "",
+      "classes": "w-max border-gray-500/20 bg-ide-chat-background bg-editor-background text-editor-foreground origin-bottom outline-hidden z-50 w-72 rounded-md border s",
+      "childCount": 1
+    },
+    {
+      "tag": "DIV",
+      "id": "",
+      "classes": "relative flex flex-col gap-8 text-ide-message-block-bot-color px-2",
+      "childCount": 1
+    },
+    {
+      "tag": "DIV",
+      "id": "",
+      "classes": "border-gray-500/20 bg-ide-chat-background w-max bg-editor-background text-editor-foreground origin-bottom outline-hidden z-50 w-72 rounded-md border s",
+      "childCount": 1
+    },
+    {
+      "tag": "DIV",
+      "id": "",
+      "classes": "border-gray-500/20 bg-ide-chat-background w-max bg-editor-background text-editor-foreground origin-bottom outline-hidden z-50 w-72 rounded-md border s",
+      "childCount": 1
+    },
+    {
+      "tag": "DIV",
+      "id": "",
+      "classes": "!border-0 bg-ide-chat-background bg-editor-background text-editor-foreground origin-bottom outline-hidden z-50 w-72 rounded-md border shadow-md transi",
+      "childCount": 1
+    }
+  ],
+  "appRoots": [],
+  "shadowRoots": []
+}

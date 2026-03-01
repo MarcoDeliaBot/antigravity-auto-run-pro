@@ -1,0 +1,171 @@
+﻿AGENT MANAGER (Manager): WS error - Unexpected server response: 500
+
+========== SETTINGS ==========
+{
+  "title": "Settings",
+  "url": "vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/workbench/workbench-jetski-agent.html",
+  "bodyClasses": "",
+  "hasReactAppContainer": false,
+  "hasAgentClass": false,
+  "hasVscodeContext": false,
+  "topLevelClasses": [
+    "relative",
+    "w-screen",
+    "h-screen",
+    "overflow-hidden",
+    "flex",
+    "w-full",
+    "h-full",
+    "outline-none",
+    "flex-col",
+    "border-gray-500/20",
+    "border-b-[1px]"
+  ],
+  "buttonCount": 192,
+  "buttonTexts": [
+    {
+      "text": "Agent",
+      "tag": "DIV",
+      "classes": "flex items-center gap-2 group mx-2 px-2 py-1 rounded-md cursor-pointer transition-all hover:bg-list-",
+      "testId": "",
+      "role": "button"
+    },
+    {
+      "text": "Browser",
+      "tag": "DIV",
+      "classes": "flex items-center gap-2 group mx-2 px-2 py-1 rounded-md cursor-pointer transition-all hover:bg-list-",
+      "testId": "",
+      "role": "button"
+    },
+    {
+      "text": "Notifications",
+      "tag": "DIV",
+      "classes": "flex items-center gap-2 group mx-2 px-2 py-1 rounded-md cursor-pointer transition-all hover:bg-list-",
+      "testId": "",
+      "role": "button"
+    },
+    {
+      "text": "Customizations",
+      "tag": "DIV",
+      "classes": "flex items-center gap-2 group mx-2 px-2 py-1 rounded-md cursor-pointer transition-all hover:bg-list-",
+      "testId": "",
+      "role": "button"
+    },
+    {
+      "text": "Models",
+      "tag": "DIV",
+      "classes": "flex items-center gap-2 group mx-2 px-2 py-1 rounded-md cursor-pointer transition-all hover:bg-list-",
+      "testId": "",
+      "role": "button"
+    },
+    {
+      "text": "Tab",
+      "tag": "DIV",
+      "classes": "flex items-center gap-2 group mx-2 px-2 py-1 rounded-md cursor-pointer transition-all hover:bg-list-",
+      "testId": "",
+      "role": "button"
+    },
+    {
+      "text": "Editor",
+      "tag": "DIV",
+      "classes": "flex items-center gap-2 group mx-2 px-2 py-1 rounded-md cursor-pointer transition-all hover:bg-list-",
+      "testId": "",
+      "role": "button"
+    },
+    {
+      "text": "Account",
+      "tag": "DIV",
+      "classes": "flex items-center gap-2 group mx-2 px-2 py-1 rounded-md cursor-pointer transition-all hover:bg-list-",
+      "testId": "",
+      "role": "button"
+    },
+    {
+      "text": "Provide Feedback",
+      "tag": "DIV",
+      "classes": "flex items-center gap-2 group mx-2 px-2 py-1 rounded-md cursor-pointer transition-all hover:bg-list-",
+      "testId": "",
+      "role": "button"
+    },
+    {
+      "text": "",
+      "tag": "BUTTON",
+      "classes": "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out f",
+      "testId": "",
+      "role": "switch"
+    },
+    {
+      "text": "",
+      "tag": "BUTTON",
+      "classes": "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out f",
+      "testId": "",
+      "role": "switch"
+    },
+    {
+      "text": "Sign out",
+      "tag": "BUTTON",
+      "classes": "select-none rounded px-2 py-1 text-sm font-medium transition-colors cursor-pointer bg-secondary text",
+      "testId": "",
+      "role": ""
+    },
+    {
+      "text": "",
+      "tag": "BUTTON",
+      "classes": "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out f",
+      "testId": "",
+      "role": "switch"
+    },
+    {
+      "text": "Always Proceeds",
+      "tag": "BUTTON",
+      "classes": "appearance-none min-w-8 px-2 py-1 text-sm bg-gray-500/20 text-input-foreground rounded shadow-sm bor",
+      "testId": "",
+      "role": ""
+    },
+    {
+      "text": "Always Proceed",
+      "tag": "BUTTON",
+      "classes": "appearance-none min-w-8 px-2 py-1 text-sm bg-gray-500/20 text-input-foreground rounded shadow-sm bor",
+      "testId": "",
+      "role": ""
+    },
+    {
+      "text": "",
+      "tag": "BUTTON",
+      "classes": "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out f",
+      "testId": "",
+      "role": "switch"
+    },
+    {
+      "text": "Add",
+      "tag": "BUTTON",
+      "classes": "select-none rounded px-2 py-1 text-sm font-medium transition-colors cursor-pointer bg-secondary text",
+      "testId": "",
+      "role": ""
+    },
+    {
+      "text": "Add",
+      "tag": "BUTTON",
+      "classes": "select-none rounded px-2 py-1 text-sm font-medium transition-colors cursor-pointer bg-secondary text",
+      "testId": "",
+      "role": ""
+    },
+    {
+      "text": "",
+      "tag": "BUTTON",
+      "classes": "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out f",
+      "testId": "",
+      "role": "switch"
+    },
+    {
+      "text": "",
+      "tag": "BUTTON",
+      "classes": "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out f",
+      "testId": "",
+      "role": "switch"
+    }
+  ],
+  "iframeCount": 0,
+  "iframes": [],
+  "shadowHosts": [],
+  "reactElements": []
+}

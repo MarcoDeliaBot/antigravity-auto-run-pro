@@ -1,0 +1,97 @@
+﻿=== HTTP /json/list targets ===
+[0] type=page title="antigravity-auto-run-pro - Antigravity - Analysis Agent Manager" id=78D1DEB338EA3D2B4265BFEF5CEE56B1
+    url=vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/wo
+[1] type=page title="TaskCloud - Antigravity - Walkthrough" id=C3FF836D9F1D12DEA83024D0F3E85670
+    url=vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/wo
+[2] type=page title="Settings" id=5C5A8E992EA0092D6844B0959D6BBECE
+    url=vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/wo
+[3] type=page title="Home ┬À MarcoDeliaBot/antigravity-auto-run-pro Wiki ┬À GitHub" id=F47E8B9D4A4C7EF32D97F9DD4BED81BD
+    url=https://github.com/MarcoDeliaBot/antigravity-auto-run-pro/wiki
+[4] type=worker title="TextMateWorker" id=58C482C76BFAC198042588EEE1631BDD
+    url=blob:vscode-file://vscode-app/835ef354-bb97-4ad8-812a-d5a049749aac
+[5] type=worker title="LanguageDetectionWorker" id=E760148DCA7E9EE3899BB2CAFA1370AF
+    url=blob:vscode-file://vscode-app/4d74dc0e-5771-4b34-b8e7-f0ab4418dc94
+[6] type=worker title="editorWorkerService" id=CF41DA148E94518422230E2C8EBA6FA6
+    url=blob:vscode-file://vscode-app/5b4ff953-def3-41ff-8694-595f755a6c90
+[7] type=worker title="editorWorkerService" id=4F97A383C9861C60FF1AA8DF6051B03A
+    url=blob:vscode-file://vscode-app/0e11e035-ac99-4c4e-8582-27f49d80cc41
+[8] type=worker title="TextMateWorker" id=2D0F7F3461A776CEB8945FBCE4F9467B
+    url=blob:vscode-file://vscode-app/e7d87ec6-f35f-4275-9785-07a80e1dbb7a
+
+=== Browser Target.getTargets ===
+
+Found 9 total targets:
+  [0] type=worker title="TextMateWorker"
+       url=blob:vscode-file://vscode-app/835ef354-bb97-4ad8-812a-d5a049749aac
+       targetId=58C482C76BFAC198042588EEE1631BDD attached=true
+  [1] type=worker title="LanguageDetectionWorker"
+       url=blob:vscode-file://vscode-app/4d74dc0e-5771-4b34-b8e7-f0ab4418dc94
+       targetId=E760148DCA7E9EE3899BB2CAFA1370AF attached=true
+  [2] type=worker title="editorWorkerService"
+       url=blob:vscode-file://vscode-app/5b4ff953-def3-41ff-8694-595f755a6c90
+       targetId=CF41DA148E94518422230E2C8EBA6FA6 attached=true
+  [3] type=worker title="editorWorkerService"
+       url=blob:vscode-file://vscode-app/0e11e035-ac99-4c4e-8582-27f49d80cc41
+       targetId=4F97A383C9861C60FF1AA8DF6051B03A attached=true
+  [4] type=worker title="TextMateWorker"
+       url=blob:vscode-file://vscode-app/e7d87ec6-f35f-4275-9785-07a80e1dbb7a
+       targetId=2D0F7F3461A776CEB8945FBCE4F9467B attached=true
+  [5] type=page title="antigravity-auto-run-pro - Antigravity - Analysis Agent Manager" [AGENT]
+       url=vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/workbench/wo
+       targetId=78D1DEB338EA3D2B4265BFEF5CEE56B1 attached=true
+  [6] type=page title="Home ┬À MarcoDeliaBot/antigravity-auto-run-pro Wiki ┬À GitHub"
+       url=https://github.com/MarcoDeliaBot/antigravity-auto-run-pro/wiki
+       targetId=F47E8B9D4A4C7EF32D97F9DD4BED81BD attached=true
+  [7] type=page title="TaskCloud - Antigravity - Walkthrough"
+       url=vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/workbench/wo
+       targetId=C3FF836D9F1D12DEA83024D0F3E85670 attached=true
+  [8] type=page title="Settings" [JETSKI]
+       url=vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/workbench/wo
+       targetId=5C5A8E992EA0092D6844B0959D6BBECE attached=true
+
+=== Inspecting 2 interesting targets ===
+
+Attached to "antigravity-auto-run-pro - Antigravity - Analysis Agent Manager" (session: 8A3DA0284CC5484E6B15...)
+
+Attached to "Settings" (session: D8D622B6F929233B9F4D...)
+
+--- DOM of "Settings" ---
+{
+  "title": "Settings",
+  "url": "vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/workbench/workbench-jetski-agent.html",
+  "bodyHTML": "\n\n\n\n<script src=\"./jetskiAgent.js\" type=\"module\"></script>\n\n\n<div><div class=\"relative w-screen h-screen overflow-hidden\"><div class=\"flex w-full h-full outline-none flex-col\"><div class=\"border-gray-500/20 flex border-b-[1px]\" style=\"height: 35px; flex-shrink: 0;\"><div class=\"w-full h-full flex justify-between items-center\" style=\"background-color: var(--vscode-titleBar-activeBackground); app-region: drag;\"><div class=\"flex items-center justify-center w-full gap-2\"><div class=\"text-xs\">Settings",
+  "hasReactAppContainer": false,
+  "hasAgentClass": false,
+  "buttons": [
+    "Agent",
+    "Browser",
+    "Notifications",
+    "Customizations",
+    "Models",
+    "Tab",
+    "Editor",
+    "Account",
+    "Provide Feedback",
+    "Sign out",
+    "Always Proceeds",
+    "Always Proceed",
+    "Add",
+    "Add"
+  ],
+  "frames": []
+}
+
+--- DOM of "antigravity-auto-run-pro - Antigravity - Analysis Agent Manager" ---
+{
+  "title": "antigravity-auto-run-pro - Antigravity - Analysis Agent Manager",
+  "url": "vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/workbench/workbench.html",
+  "bodyHTML": "\n\n\n\n<script src=\"./workbench.js\" type=\"module\"></script>\n\n<div id=\"monaco-parts-splash\" class=\"vs-dark\" style=\"display: none;\"><div style=\"position: absolute; width: 100%; height: 35px; left: 0px; top: 0px; background-color: rgb(16, 25, 44); app-region: drag;\"></div><div style=\"position: absolute; width: 42px; height: calc(100% - 57px); top: 35px; left: 0px; background-color: rgb(5, 19, 54);\"></div><div style=\"position: absolute; width: 300px; height: calc(100% - 57px); top: 35px; left: 42px; ba",
+  "hasReactAppContainer": false,
+  "hasAgentClass": true,
+  "buttons": [
+    "antigravity-auto-run-pro",
+    "Outline",
+    "Timeline"
+  ],
+  "frames": []
+}

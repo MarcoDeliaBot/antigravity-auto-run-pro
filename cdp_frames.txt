@@ -1,0 +1,47 @@
+﻿=== Enabling auto-attach ===
+EVENT: Target.attachedToTarget {"sessionId":"33F60108CAB858D92A416E84A02AA48A","targetInfo":{"targetId":"5C5A8E992EA0092D6844B0959D6BBECE","type":"page","title":"Settings","url":"vscode-file://vscode-app/c:/Users/Marco/AppData/Loca
+EVENT: Target.attachedToTarget {"sessionId":"3B3A0CAF4A55CB0B34E573DCDE84204A","targetInfo":{"targetId":"78D1DEB338EA3D2B4265BFEF5CEE56B1","type":"page","title":"antigravity-auto-run-pro - Antigravity - Analysis Agent Manager","url
+EVENT: Target.attachedToTarget {"sessionId":"6E9ECFDD4FE70741C8C970726C627F60","targetInfo":{"targetId":"C3FF836D9F1D12DEA83024D0F3E85670","type":"page","title":"TaskCloud - Antigravity - Walkthrough","url":"vscode-file://vscode-ap
+EVENT: Target.attachedToTarget {"sessionId":"135AC4706A116020530BA3283550F6BB","targetInfo":{"targetId":"F47E8B9D4A4C7EF32D97F9DD4BED81BD","type":"page","title":"Home ┬À MarcoDeliaBot/antigravity-auto-run-pro Wiki ┬À GitHub","url":"h
+Auto-attach result: {}
+EVENT: Target.targetCreated {"targetInfo":{"targetId":"2D0F7F3461A776CEB8945FBCE4F9467B","type":"worker","title":"TextMateWorker","url":"blob:vscode-file://vscode-app/e7d87ec6-f35f-4275-9785-07a80e1dbb7a","attached":true,"canAcc
+EVENT: Target.targetCreated {"targetInfo":{"targetId":"4F97A383C9861C60FF1AA8DF6051B03A","type":"worker","title":"editorWorkerService","url":"blob:vscode-file://vscode-app/0e11e035-ac99-4c4e-8582-27f49d80cc41","attached":true,"c
+EVENT: Target.targetCreated {"targetInfo":{"targetId":"58C482C76BFAC198042588EEE1631BDD","type":"worker","title":"TextMateWorker","url":"blob:vscode-file://vscode-app/835ef354-bb97-4ad8-812a-d5a049749aac","attached":true,"canAcc
+EVENT: Target.targetCreated {"targetInfo":{"targetId":"5C5A8E992EA0092D6844B0959D6BBECE","type":"page","title":"Settings","url":"vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/cod
+EVENT: Target.targetCreated {"targetInfo":{"targetId":"78D1DEB338EA3D2B4265BFEF5CEE56B1","type":"page","title":"antigravity-auto-run-pro - Antigravity - Analysis Agent Manager","url":"vscode-file://vscode-app/c:/Users/Marco/AppD
+EVENT: Target.targetCreated {"targetInfo":{"targetId":"C3FF836D9F1D12DEA83024D0F3E85670","type":"page","title":"TaskCloud - Antigravity - Walkthrough","url":"vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigra
+EVENT: Target.targetCreated {"targetInfo":{"targetId":"CF41DA148E94518422230E2C8EBA6FA6","type":"worker","title":"editorWorkerService","url":"blob:vscode-file://vscode-app/5b4ff953-def3-41ff-8694-595f755a6c90","attached":true,"c
+EVENT: Target.targetCreated {"targetInfo":{"targetId":"E760148DCA7E9EE3899BB2CAFA1370AF","type":"worker","title":"LanguageDetectionWorker","url":"blob:vscode-file://vscode-app/4d74dc0e-5771-4b34-b8e7-f0ab4418dc94","attached":tru
+EVENT: Target.targetCreated {"targetInfo":{"targetId":"F47E8B9D4A4C7EF32D97F9DD4BED81BD","type":"page","title":"Home ┬À MarcoDeliaBot/antigravity-auto-run-pro Wiki ┬À GitHub","url":"https://github.com/MarcoDeliaBot/antigravity-aut
+
+Total targets found: 9
+  [0] type=worker title="TextMateWorker" attached=true
+       url=blob:vscode-file://vscode-app/835ef354-bb97-4ad8-812a-d5a049749aac
+  [1] type=worker title="LanguageDetectionWorker" attached=true
+       url=blob:vscode-file://vscode-app/4d74dc0e-5771-4b34-b8e7-f0ab4418dc94
+  [2] type=worker title="editorWorkerService" attached=true
+       url=blob:vscode-file://vscode-app/5b4ff953-def3-41ff-8694-595f755a6c90
+  [3] type=worker title="editorWorkerService" attached=true
+       url=blob:vscode-file://vscode-app/0e11e035-ac99-4c4e-8582-27f49d80cc41
+  [4] type=worker title="TextMateWorker" attached=true
+       url=blob:vscode-file://vscode-app/e7d87ec6-f35f-4275-9785-07a80e1dbb7a
+  [5] type=page title="antigravity-auto-run-pro - Antigravity - Analysis Agent Mana" attached=true
+       url=vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/workbench/workbench.html
+  [6] type=page title="Home ┬À MarcoDeliaBot/antigravity-auto-run-pro Wiki ┬À GitHub" attached=true
+       url=https://github.com/MarcoDeliaBot/antigravity-auto-run-pro/wiki
+  [7] type=page title="TaskCloud - Antigravity - Walkthrough" attached=true
+       url=vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/workbench/workbench.html
+  [8] type=page title="Settings" [JETSKI] attached=true
+       url=vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/workbench/workbench-jetski-agent
+
+=== Attaching to main workbench target ===
+EVENT: Target.attachedToTarget {"sessionId":"7FF91FC8AD763283ACCEABC224498CD4","targetInfo":{"targetId":"78D1DEB338EA3D2B4265BFEF5CEE56B1","type":"page","title":"antigravity-auto-run-pro - Antigravity - Analysis Agent Manager","url
+Session: 7FF91FC8AD763283ACCE...
+
+=== Page.getFrameTree ===
+Frame: id=78D1DEB338EA3D2B4265BFEF5CEE56B1 name="" url=vscode-file://vscode-app/c:/Users/Marco/AppData/Local/Programs/Antigravity/resources/app/out/vs/code/electron-browser/wo
+No child frames found in tree
+
+=== Deep webview search ===
+Webviews found: 0
+Shadow webviews found: 0

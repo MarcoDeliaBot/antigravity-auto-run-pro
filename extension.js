@@ -1,4 +1,4 @@
-// AntiGravity AutoAccept v1.4.1
+// AntiGravity AutoAccept v1.5.0
 // Primary: VS Code Commands API with async lock
 // Secondary: Shadow DOM-piercing CDP for permission & action buttons
 
@@ -28,6 +28,7 @@ const SAFE_TEXTS = [
     'esegui', 'accetta', // Italian
     'continue', 'proceed',
     'continua', 'procedi',
+    'always run', 'esegui sempre', // Agent Manager persistent auto-run
     'allow once', 'consenti una volta', // Browser domain permission prompts
 ];
 
@@ -50,11 +51,14 @@ function buildPermissionScript(customTexts, godMode) {
     
     // ═══ WEBVIEW GUARD ═══
     // Check for Antigravity agent panel DOM markers.
-    // The panel has .react-app-container; the main VS Code window doesn't.
-    // This prevents false positives (sidebars, markdown, menus).
+    // Supports both legacy (.react-app-container) and current Antigravity
+    // versions (.antigravity-agent-side-panel in workbench.html).
+    // This prevents false positives on non-Antigravity browser pages.
     if (!document.querySelector('.react-app-container') && 
         !document.querySelector('[class*="agent"]') &&
-        !document.querySelector('[data-vscode-context]')) {
+        !document.querySelector('[data-vscode-context]') &&
+        !document.querySelector('.antigravity-agent-side-panel') &&
+        !document.querySelector('[class*="antigravity"]')) {
         return 'not-agent-panel';
     }
     
@@ -587,7 +591,7 @@ function applyTemporarySessionRestart() {
 // ─── Activation ───────────────────────────────────────────────────────
 function activate(context) {
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.4.2)');
+    log('Extension activating (v1.5.0)');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);

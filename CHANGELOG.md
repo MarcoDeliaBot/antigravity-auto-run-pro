@@ -1,3 +1,14 @@
+## [1.5.0] - 2026-03-01
+
+### Added
+- **Agent Manager support**: the Webview Guard now recognizes `.antigravity-agent-side-panel` and `[class*="antigravity"]`, enabling auto-click on buttons inside the Agent Manager side panel (used in Antigravity v1.107+).
+- Added **"Always run"** and **"Esegui sempre"** to `SAFE_TEXTS` for the persistent auto-run button in the Agent Manager.
+
+### Fixed
+- CDP permission clicker was blocked on current Antigravity versions because `.react-app-container` no longer exists in the DOM. The guard now passes when any Antigravity-specific class is detected.
+
+---
+
 ## [1.4.2] - 2026-02-26
 
 ### Added

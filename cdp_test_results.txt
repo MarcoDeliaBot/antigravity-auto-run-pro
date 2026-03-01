@@ -1,0 +1,4 @@
+﻿[PASS] "antigravity-auto-run-pro - Antigravity - Analysis " | guard=true agent=true antigravity=true sidePanel=true alwaysRun=true
+[PASS] "TaskCloud - Antigravity - Walkthrough" | guard=true agent=true antigravity=true sidePanel=true alwaysRun=true
+[BLOCKED] "Settings" | guard=false agent=false antigravity=false sidePanel=false alwaysRun=false
+[BLOCKED] "Home ┬À MarcoDeliaBot/antigravity-auto-run-pro Wiki" | guard=false agent=false antigravity=false sidePanel=false alwaysRun=false
