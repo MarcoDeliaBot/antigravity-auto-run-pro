@@ -10,7 +10,7 @@
         "free auto accept agent",
         "automation"
     ],
-    "version": "1.5.0",
+    "version": "1.5.1",
     "icon": "icon.png",
     "publisher": "marcodelia",
     "author": "Marco D'Elia",
@@ -19,7 +19,7 @@
         "url": "https://github.com/MarcoDeliaBot/antigravity-auto-run-pro.git"
     },
     "engines": {
-        "vscode": "^1.60.0"
+        "vscode": "^1.63.0"
     },
     "activationEvents": [
         "onStartupFinished"

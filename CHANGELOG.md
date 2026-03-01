@@ -1,3 +1,10 @@
+## [1.5.1] - 2026-03-01
+
+### Added
+- Supporto per le versioni pre-release (aggiornato `engines.vscode` a `^1.63.0`).
+
+---
+
 ## [1.5.0] - 2026-03-01
 
 ### Added
