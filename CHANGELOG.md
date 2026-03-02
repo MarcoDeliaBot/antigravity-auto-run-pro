@@ -1,3 +1,10 @@
+## [1.5.2] - 2026-03-02
+
+### Added
+- Aggiunti screenshot esplicativi alle pagine della Wiki per facilitarne la comprensione tecnica.
+
+---
+
 ## [1.5.1] - 2026-03-01
 
 ### Added
