@@ -39,7 +39,7 @@ const UNSAFE_TEXTS = [
     'consenti sempre', 'consenti in questa conversazione', 'consenti',
 ];
 
-function buildPermissionScript(customTexts, godMode) {
+function buildPermissionScript(customTexts, godMode, standbyButton) {
     const allTexts = godMode
         ? [...SAFE_TEXTS, ...UNSAFE_TEXTS, ...customTexts]
         : [...SAFE_TEXTS, ...customTexts];
@@ -48,6 +48,7 @@ function buildPermissionScript(customTexts, godMode) {
 (function() {
     var BUTTON_TEXTS = ${JSON.stringify(allTexts)};
     var GOD_MODE = ${godMode ? 'true' : 'false'};
+    var STANDBY_BUTTON = ${standbyButton ? JSON.stringify(standbyButton) : 'null'};
     
     // ═══ WEBVIEW GUARD ═══
     // Check for Antigravity agent panel DOM markers.
@@ -153,6 +154,9 @@ function buildPermissionScript(customTexts, godMode) {
     for (var t = 0; t < BUTTON_TEXTS.length; t++) {
         var btn = findButton(document.body, BUTTON_TEXTS[t]);
         if (btn) {
+            if (STANDBY_BUTTON === BUTTON_TEXTS[t]) {
+                return 'standby-present:' + BUTTON_TEXTS[t];
+            }
             btn.click();
             return 'clicked:' + BUTTON_TEXTS[t];
         }
@@ -166,6 +170,8 @@ function buildPermissionScript(customTexts, godMode) {
 let isEnabled = false;
 let isAccepting = false; // Async lock — prevents double-accepts
 let isGodMode = false;   // God Mode — also auto-accept folder access prompts
+let isStandby = false;
+let standbyButton = null;
 let pollIntervalId = null;
 let cdpIntervalId = null;
 let statusBarItem = null;
@@ -191,9 +197,15 @@ function logThrottled(key, msg, throttleMs = 30000) {
 function updateStatusBar() {
     if (!statusBarItem) return;
     if (isEnabled) {
-        statusBarItem.text = '$(zap) Auto: ON';
-        statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
-        statusBarItem.tooltip = 'AntiGravity AutoAccept is ACTIVE — click to disable';
+        if (isStandby) {
+            statusBarItem.text = '$(clock) Auto: STANDBY';
+            statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+            statusBarItem.tooltip = 'AntiGravity AutoAccept is in STANDBY (loop detected) — will resume automatically';
+        } else {
+            statusBarItem.text = '$(zap) Auto: ON';
+            statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+            statusBarItem.tooltip = 'AntiGravity AutoAccept is ACTIVE — click to disable';
+        }
     } else {
         statusBarItem.text = '$(circle-slash) Auto: OFF';
         statusBarItem.backgroundColor = undefined;
@@ -372,11 +384,18 @@ async function clickBannerViaDom(wsUrl) {
 // Wider port scan: 9000-9014 + common Chromium/Node defaults
 const CDP_PORTS = [9222, 9229, ...Array.from({ length: 15 }, (_, i) => 9000 + i)];
 
+let isCheckingCDP = false;
+let lastClickedButton = null;
+let lastClickedTime = 0;
+let consecutiveClickCount = 0;
+
 async function checkPermissionButtons() {
-    if (!isEnabled) return;
+    if (!isEnabled || isCheckingCDP) return;
+    isCheckingCDP = true;
+
     const config = vscode.workspace.getConfiguration('autorunpro');
     const customTexts = config.get('customButtonTexts', []);
-    const script = buildPermissionScript(customTexts, isGodMode);
+    const script = buildPermissionScript(customTexts, isGodMode, standbyButton);
     let cdpAttempted = false;
     let anyConnected = false;
 
@@ -388,19 +407,59 @@ async function checkPermissionButtons() {
                 if (pages.length === 0) continue;
                 cdpAttempted = true;
 
-                // Evaluate on all targets — the Webview Guard inside the script
-                // handles isolation (non-webview targets return 'not-agent-panel')
+                // Evaluate on all targets
                 for (let i = 0; i < pages.length; i++) {
                     try {
                         const result = await cdpEvaluate(pages[i].webSocketDebuggerUrl, script);
                         if (result && result.startsWith('clicked:')) {
-                            log(`[CDP] ✓ ${result}`);
+                            const btnText = result.substring(8);
+                            const now = Date.now();
+
+                            // ═══ ANTI INFINITE LOOP ═══
+                            if (config.get('antiLoopProtection', true)) {
+                                if (btnText === lastClickedButton && (now - lastClickedTime) < 3000) {
+                                    consecutiveClickCount++;
+                                } else {
+                                    lastClickedButton = btnText;
+                                    consecutiveClickCount = 1;
+                                }
+                                lastClickedTime = now;
+
+                                if (consecutiveClickCount > 5) {
+                                    log(`[CDP] 🔴 Loop detected for "${btnText}". Entering STANDBY mode.`);
+                                    vscode.window.showWarningMessage(`⏳ AntiGravity AutoRun: Loop detected on "${btnText}". Standing by until the prompt changes.`);
+                                    isStandby = true;
+                                    standbyButton = btnText;
+                                    updateStatusBar();
+                                    isCheckingCDP = false;
+                                    return;
+                                }
+                            }
+
+                            log(`[CDP] ✓ ${result} (count: ${consecutiveClickCount})`);
+                            isCheckingCDP = false;
+                            return;
+                        } else if (result && result.startsWith('standby-present:')) {
+                            // Still in standby, button still there. Do nothing.
+                            isCheckingCDP = false;
+                            return;
+                        } else if (result === 'no-permission-button' || result === 'not-agent-panel') {
+                            if (isStandby) {
+                                log(`[CDP] 🟢 Button disappeared. Exiting STANDBY mode.`);
+                                vscode.window.showInformationMessage(`▶️ AntiGravity AutoRun: Standby ended. Resuming auto-run.`);
+                                isStandby = false;
+                                standbyButton = null;
+                                consecutiveClickCount = 0;
+                                updateStatusBar();
+                            }
+                            isCheckingCDP = false;
                             return;
                         }
                     } catch (e) {
                         logThrottled('cdp-eval-error', `[CDP] ⚠️ Eval error on port ${port}: ${e.message}`, 60000);
                     }
                 }
+                isCheckingCDP = false;
                 return; // Found the correct connected port, stop scanning other ports
             } catch (e) { /* port not open, next port */ }
         }
@@ -415,6 +474,8 @@ async function checkPermissionButtons() {
     } catch (e) {
         logThrottled('cdp-fatal', `[CDP] 🔴 Fatal error in polling: ${e.message}`, 60000);
     }
+
+    isCheckingCDP = false;
 }
 
 // ─── Polling with Async Lock ──────────────────────────────────────────
@@ -427,7 +488,7 @@ function startPolling() {
 
     // VS Code commands — with async lock to prevent double-accepts
     pollIntervalId = setInterval(async () => {
-        if (!isEnabled || isAccepting) return;
+        if (!isEnabled || isAccepting || isStandby) return;
         isAccepting = true;
         try {
             const results = await Promise.allSettled(
@@ -613,7 +674,14 @@ function activate(context) {
         vscode.commands.registerCommand('autorunpro.toggle', () => {
             isEnabled = !isEnabled;
             log(`Toggled: ${isEnabled ? 'ON' : 'OFF'}`);
-            if (isEnabled) { startPolling(); } else { stopPolling(); }
+            if (isEnabled) {
+                isStandby = false;
+                standbyButton = null;
+                consecutiveClickCount = 0;
+                startPolling();
+            } else {
+                stopPolling();
+            }
             updateStatusBar();
             context.globalState.update('autorunproEnabled', isEnabled);
             vscode.window.showInformationMessage(

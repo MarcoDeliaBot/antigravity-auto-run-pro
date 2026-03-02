@@ -1,3 +1,24 @@
+## [1.5.5] - 2026-03-02
+
+### Changed
+- Sostituita la disattivazione automatica per i loop infiniti con la modalità **STANDBY**: se viene rilevato un loop, l'estensione si mette in pausa (mostrando l'icona 🕒 sulla barra di stato) finché il pulsante bloccato non scompare dall'interfaccia (es. quando l'utente scrive un nuovo prompt nel pannello), riprendendo poi l'esecuzione automaticamente.
+
+---
+
+## [1.5.4] - 2026-03-02
+
+### Added
+- Resa opzionale la protezione anti-loop introdotta nella versione precedente tramite l'impostazione `autorunpro.antiLoopProtection` (attiva di default).
+
+---
+
+## [1.5.3] - 2026-03-02
+
+### Added
+- Aggiunta protezione contro i loop infiniti per i pulsanti CDP: se un pulsante viene ciclicamente premuto senza successo, l'estensione si disattiva da sola dopo 5 tentativi consecutivi ravvicinati.
+
+---
+
 ## [1.5.2] - 2026-03-02
 
 ### Added

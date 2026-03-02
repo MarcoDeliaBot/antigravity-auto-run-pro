@@ -10,7 +10,7 @@
         "free auto accept agent",
         "automation"
     ],
-    "version": "1.5.2",
+    "version": "1.5.5",
     "icon": "icon.png",
     "publisher": "marcodelia",
     "author": "Marco D'Elia",
@@ -61,6 +61,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "⚠️ God Mode: auto-accept parent folder access prompts (Allow, Always Allow, Consenti). DISABLED by default for safety — enabling this lets the agent access files outside your workspace without confirmation."
+                },
+                "autorunpro.antiLoopProtection": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Anti-loop protection: puts the extension in STANDBY if the same button is clicked repeatedly without success. Resumes automatically when the UI changes (e.g., when a new prompt is generated)."
                 },
                 "autorunpro.pollInterval": {
                     "type": "number",

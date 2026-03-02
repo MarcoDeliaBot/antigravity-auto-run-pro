@@ -1,0 +1,15 @@
+.vscode/**
+.vscode-test/**
+out/**
+src/**
+.gitignore
+.yarnrc
+.npmignore
+*.vsix
+_backup/**
+wiki/**
+cdp_*.txt
+*.txt
+cdp_debug.js
+cdp_inspect.js
+node_modules/@types/**
