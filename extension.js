@@ -140,10 +140,11 @@ function buildPermissionScript(customTexts, godMode, standbyButton) {
             if (textMatches(checkText, text)) {
                 var clickable = closestClickable(node);
                 var tag2 = (clickable.tagName || '').toLowerCase();
+                var textLower = (clickable.textContent || '').trim().toLowerCase();
                 if (tag2 === 'button' || tag2.includes('button') || clickable.getAttribute('role') === 'button' || 
                     tag2.includes('btn') || clickable.classList.contains('cursor-pointer') ||
                     clickable.onclick || clickable.getAttribute('tabindex') === '0' ||
-                    text === 'expand' || text === 'requires input') {
+                    text === 'expand' || text === 'requires input' || textLower === 'accept all' || textLower === 'accetta tutto') {
                     return clickable;
                 }
             }

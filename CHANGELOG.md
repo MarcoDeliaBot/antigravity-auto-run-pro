@@ -1,5 +1,11 @@
-## [1.5.5] - 2026-03-02
+## [1.5.6] - 2026-03-02
 
+### Fixed
+- Migliorato il riconoscimento del bottone `Accept all` per le modifiche ai file nei Chat Edits. Il clicker CDP ora riconosce correttamente anche gli span (e altri contenitori testuali) isolati in cui appare il testo "Accept all" o "Accetta tutto".
+
+---
+
+## [1.5.5] - 2026-03-02
 ### Changed
 - Sostituita la disattivazione automatica per i loop infiniti con la modalità **STANDBY**: se viene rilevato un loop, l'estensione si mette in pausa (mostrando l'icona 🕒 sulla barra di stato) finché il pulsante bloccato non scompare dall'interfaccia (es. quando l'utente scrive un nuovo prompt nel pannello), riprendendo poi l'esecuzione automaticamente.
 
