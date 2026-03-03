@@ -1,10 +1,12 @@
-// AntiGravity AutoAccept v1.5.0
+// AntiGravity AutoAccept v1.5.6
 // Primary: VS Code Commands API with async lock
 // Secondary: Shadow DOM-piercing CDP for permission & action buttons
 
 const vscode = require('vscode');
 const http = require('http');
 const WebSocket = require('ws');
+const fs = require('fs');
+const path = require('path');
 
 // ─── VS Code Commands ─────────────────────────────────────────────────
 // Only Antigravity-specific commands — generic VS Code commands like
@@ -180,8 +182,23 @@ let godModeStatusBarItem = null;
 let outputChannel = null;
 
 function log(msg) {
+    const timestamp = new Date().toLocaleTimeString();
+    const fullMsg = `${timestamp} ${msg}`;
     if (outputChannel) {
-        outputChannel.appendLine(`${new Date().toLocaleTimeString()} ${msg}`);
+        outputChannel.appendLine(fullMsg);
+    }
+    logToFile(fullMsg);
+}
+
+function logToFile(msg) {
+    try {
+        const rootPath = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : null;
+        if (rootPath) {
+            const logPath = path.join(rootPath, 'autorun_pro.log');
+            fs.appendFileSync(logPath, msg + '\n', 'utf8');
+        }
+    } catch (e) {
+        // Silent fail for logging
     }
 }
 
@@ -453,15 +470,12 @@ async function checkPermissionButtons() {
                                 consecutiveClickCount = 0;
                                 updateStatusBar();
                             }
-                            isCheckingCDP = false;
-                            return;
+                            // Continue to next page - do not return early!
                         }
                     } catch (e) {
                         logThrottled('cdp-eval-error', `[CDP] ⚠️ Eval error on port ${port}: ${e.message}`, 60000);
                     }
                 }
-                isCheckingCDP = false;
-                return; // Found the correct connected port, stop scanning other ports
             } catch (e) { /* port not open, next port */ }
         }
 
@@ -653,7 +667,7 @@ function applyTemporarySessionRestart() {
 // ─── Activation ───────────────────────────────────────────────────────
 function activate(context) {
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.5.0)');
+    log('Extension activating (v1.5.6)');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);

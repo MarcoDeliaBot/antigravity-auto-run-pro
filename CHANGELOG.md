@@ -1,7 +1,12 @@
-## [1.5.6] - 2026-03-02
+## [1.5.6] - 2026-03-03
 
 ### Fixed
-- Migliorato il riconoscimento del bottone `Accept all` per le modifiche ai file nei Chat Edits. Il clicker CDP ora riconosce correttamente anche gli span (e altri contenitori testuali) isolati in cui appare il testo "Accept all" o "Accetta tutto".
+- Corretto bug nel ciclo di scansione CDP: ora l'estensione analizza correttamente tutte le pagine webview aperte invece di fermarsi alla prima (risolto il problema del mancato riconoscimento di "Accept all" nel pannello chat).
+- Migliorato il riconoscimento del bottone `Accept all` per le modifiche ai file nei Chat Edits (riconoscimento di span isolati).
+- Aggiornate le stringhe di versione interne per coerenza.
+
+### Added
+- Introdotto il logging su file (`autorun_pro.log`) per facilitare la diagnosi dei problemi senza dover aprire il canale di output di VS Code.
 
 ---
 
