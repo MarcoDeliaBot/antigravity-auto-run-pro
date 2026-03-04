@@ -1,3 +1,15 @@
+## [1.5.7] - 2026-03-04
+
+### Added
+- Introduzione del comando `AntiGravity Auto Run Pro: Open Log File` per aprire il file di log in VS Code.
+- Aggiunto timer Watchdog di 10 secondi per ripristinare il polling CDP in caso di timeout/blocco anomalo della comunicazione WebSocket col browser.
+- Aggiunto contributo comando `autorunpro.openLog` in `package.json`.
+
+### Changed
+- Migliorato il sistema di logging: ora il file log viene salvato centralmente nella `globalStorage` dell'estensione (non più inquinando la home o il workspace corrente).
+
+---
+
 ## [1.5.6] - 2026-03-03
 
 ### Fixed

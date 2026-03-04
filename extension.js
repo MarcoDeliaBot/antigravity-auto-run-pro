@@ -180,6 +180,7 @@ let cdpIntervalId = null;
 let statusBarItem = null;
 let godModeStatusBarItem = null;
 let outputChannel = null;
+let extensionContext = null; // Global context for storage path
 
 function log(msg) {
     const timestamp = new Date().toLocaleTimeString();
@@ -192,11 +193,18 @@ function log(msg) {
 
 function logToFile(msg) {
     try {
-        const rootPath = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : null;
-        if (rootPath) {
-            const logPath = path.join(rootPath, 'autorun_pro.log');
-            fs.appendFileSync(logPath, msg + '\n', 'utf8');
+        if (!extensionContext) return;
+
+        const storageUri = extensionContext.globalStorageUri;
+        if (!storageUri) return;
+
+        const storagePath = storageUri.fsPath;
+        if (!fs.existsSync(storagePath)) {
+            fs.mkdirSync(storagePath, { recursive: true });
         }
+
+        const logPath = path.join(storagePath, 'autorun_pro.log');
+        fs.appendFileSync(logPath, msg + '\n', 'utf8');
     } catch (e) {
         // Silent fail for logging
     }
@@ -411,6 +419,14 @@ async function checkPermissionButtons() {
     if (!isEnabled || isCheckingCDP) return;
     isCheckingCDP = true;
 
+    // CD Watchdog: If checking takes more than 10 seconds, reset the flag to prevent infinite hang
+    const watchdogTimer = setTimeout(() => {
+        if (isCheckingCDP) {
+            logThrottled('cdp-watchdog', '[CDP] 🔴 Watchdog: CDP check hung for 10s. Resetting state.', 60000);
+            isCheckingCDP = false;
+        }
+    }, 10000);
+
     const config = vscode.workspace.getConfiguration('autorunpro');
     const customTexts = config.get('customButtonTexts', []);
     const script = buildPermissionScript(customTexts, isGodMode, standbyButton);
@@ -488,6 +504,8 @@ async function checkPermissionButtons() {
 
     } catch (e) {
         logThrottled('cdp-fatal', `[CDP] 🔴 Fatal error in polling: ${e.message}`, 60000);
+    } finally {
+        clearTimeout(watchdogTimer);
     }
 
     isCheckingCDP = false;
@@ -666,8 +684,9 @@ function applyTemporarySessionRestart() {
 
 // ─── Activation ───────────────────────────────────────────────────────
 function activate(context) {
+    extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.5.6)');
+    log('Extension activating (v1.5.7)');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -720,6 +739,24 @@ function activate(context) {
                 vscode.window.showInformationMessage(
                     '🛡️ God Mode DISABLED — folder access prompts require manual approval.'
                 );
+            }
+        })
+    );
+
+    // Open Log File command
+    context.subscriptions.push(
+        vscode.commands.registerCommand('autorunpro.openLog', async () => {
+            try {
+                if (!extensionContext) return;
+                const logPath = path.join(extensionContext.globalStorageUri.fsPath, 'autorun_pro.log');
+                if (!fs.existsSync(logPath)) {
+                    vscode.window.showInformationMessage('No log file found yet. Enable the extension to generate logs.');
+                    return;
+                }
+                const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(logPath));
+                await vscode.window.showTextDocument(doc);
+            } catch (e) {
+                vscode.window.showErrorMessage(`Failed to open log: ${e.message}`);
             }
         })
     );
