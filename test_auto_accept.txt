@@ -1,3 +1,4 @@
-Questo è un file di test per verificare la versione 1.5.6 di Antigravity Auto Run Pro.
+Questo è un file di test per verificare la versione 1.5.7 di Antigravity Auto Run Pro.
 Se stai leggendo questo senza aver cliccato nulla, l'estensione funziona alla grande!
 Aggiunta una riga extra per triggerare il diff view. Clicca automaticamente?
+Test in corso da Agente: se questo viene applicato senza prompt, il test file-accept ha successo!

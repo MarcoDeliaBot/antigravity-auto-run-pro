@@ -1,3 +1,11 @@
+## [1.5.8] - 2026-03-09
+
+### Changed
+- Eseguito test dell'estensione confermando il corretto funzionamento (auto-accept per file e auto-run per terminale).
+- Aggiornato file di test interno (`test_auto_accept.txt`).
+
+---
+
 ## [1.5.7] - 2026-03-04
 
 ### Added
