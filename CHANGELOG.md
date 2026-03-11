@@ -1,5 +1,12 @@
-## [1.6.2] - 2026-03-11
+## [1.6.3] - 2026-03-11
 
+### Fixed
+- Fixed a bug where the `Expand` and `Requires input` buttons in the Agent Manager were not auto-clicked because they were correctly parsed in the script logic but missing from the `SAFE_TEXTS` array that drives the search iterations.
+- Clarified that `Allow this conversation` prompts correctly require the **God Mode** (`Ctrl+Alt+Shift+G`) to be enabled as they authorize directory access.
+
+---
+
+## [1.6.2] - 2026-03-11
 ### Added
 - Added English feedback and support section in README.md
 

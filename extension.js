@@ -32,6 +32,8 @@ const SAFE_TEXTS = [
     'continua', 'procedi',
     'always run', 'esegui sempre', // Agent Manager persistent auto-run
     'allow once', 'consenti una volta', // Browser domain permission prompts
+    'expand', 'espandi', // Agent status 'Expand' buttons
+    'requires input', 'richiede input', // Agent status 'Requires input' buttons
 ];
 
 // Unsafe texts: only auto-accepted in God Mode (parent folder access)
