@@ -553,7 +553,9 @@ async function checkPermissionButtons() {
                             if (fingerprint !== 'no-output' && fingerprint === lastAgentFingerprint) {
                                 consecutiveFingerprintCount++;
                             } else {
+                                // RESET COMPLETO se l'output cambia (Nuovo messaggio = nuova azione)
                                 consecutiveFingerprintCount = 1;
+                                consecutiveClickCount = 1; // Reset dei click se il messaggio è nuovo!
                                 lastAgentFingerprint = fingerprint;
                                 lastUsedSelector = selector;
                             }
@@ -561,8 +563,8 @@ async function checkPermissionButtons() {
                             lastClickedTime = now;
 
                             // 3. Trigger Standby if loop confirmed
-                            // Rilassiamo le soglie: 10 click consecutivi o 6 fingerprint uguali
-                            if (consecutiveClickCount > 10 || consecutiveFingerprintCount > 6) {
+                            // Soglie ultra-permissive: 15 click consecutivi o 10 fingerprint uguali
+                            if (consecutiveClickCount > 15 || consecutiveFingerprintCount > 10) {
                                 log(`[CDP] 🔴 LOOP CONFIRMED: Btn="${btnText}" (${consecutiveClickCount}x), Fingerprint="${fingerprint}" (${consecutiveFingerprintCount}x) via "${selector}"`);
                                 vscode.window.showWarningMessage(`⏳ AutoRun Pro: Anti-Loop standby engaged for safety.`);
                                 isStandby = true;

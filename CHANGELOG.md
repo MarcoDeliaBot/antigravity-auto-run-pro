@@ -1,9 +1,12 @@
-## [1.6.4] - 2026-03-11
+## [1.6.5] - 2026-03-11
 
 ### Fixed
-- Ottimizzata la gestione dell'Anti-Loop: soglie più permissive per evitare blocchi spuri durante operazioni legittime.
-- Migliorata la logica di rilevamento del pulsante `Expand` per supportare pulsanti con icone o simboli aggiuntivi.
-- Aggiunto logging diagnostico per il Webview Guard.
+- **Anti-Loop Dynamics**: Corretto il bug dove lo standby si attivava ingiustamente durante una serie di operazioni rapide ma valide. Ora i contatori vengono resettati istantaneamente ad ogni nuovo output dell'AI.
+- **Tolleranza elevata**: Aumentate ulteriormente le soglie di rilevamento (15 click / 10 fingerprint) per garantire la massima fluidità.
+
+---
+
+## [1.6.4] - 2026-03-11
 
 ---
 
