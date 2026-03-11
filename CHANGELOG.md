@@ -1,3 +1,10 @@
+## [1.6.2] - 2026-03-11
+
+### Added
+- Added English feedback and support section in README.md
+
+---
+
 ## [1.6.1] - 2026-03-11
 
 ### Fixed

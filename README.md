@@ -40,6 +40,17 @@ Simply install **Antigravity Auto Run Pro** and enjoy a completely hands-free AI
 
 If you have just installed **Antigravity Auto Run Pro** and it does not seem to appear in searches locally, please give the marketplace up to 45 minutes to refresh its index. Once installed, it runs silently to supercharge your workflow.
 
+## Feedback & Support
+
+If you notice an issue or a bug, please let me know.
+
+I want to be completely honest: the app isn't perfect. There are still several bugs and behaviors that need improvement. Sometimes a problem can be fixed simply by restarting Antigravity, while other times restarting your PC might help.
+
+I've added a logging system to help me identify and fix errors faster. If you have the time and want to report a bug, I'll look into it as soon as possible and work on fixing it.
+
+If you have any suggestions, a helpful idea, or if you just want to reach out, you can contact me here:
+marcodelia+antigravity@gmail.com
+
 ## License
 
 MIT License. Crafted with passion to power up your development speed.
