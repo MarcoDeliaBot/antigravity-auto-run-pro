@@ -64,7 +64,7 @@ function buildPermissionScript(customTexts, godMode, standbyButton) {
         !document.querySelector('[data-vscode-context]') &&
         !document.querySelector('.antigravity-agent-side-panel') &&
         !document.querySelector('[class*="antigravity"]')) {
-        return 'not-agent-panel';
+        return 'not-agent-panel:' + (document.body ? document.body.className : 'no-body');
     }
     
     // We are safely inside the isolated agent panel webview.
@@ -145,10 +145,14 @@ function buildPermissionScript(customTexts, godMode, standbyButton) {
                 var clickable = closestClickable(node);
                 var tag2 = (clickable.tagName || '').toLowerCase();
                 var textLower = (clickable.textContent || '').trim().toLowerCase();
+                
+                // Enhanced match for 'expand' with specific Antigravity patterns
+                var isExpand = (text === 'expand' || text === 'espandi' || textLower.includes('expand') || textLower.includes('espandi'));
+                
                 if (tag2 === 'button' || tag2.includes('button') || clickable.getAttribute('role') === 'button' || 
                     tag2.includes('btn') || clickable.classList.contains('cursor-pointer') ||
                     clickable.onclick || clickable.getAttribute('tabindex') === '0' ||
-                    text === 'expand' || text === 'requires input' || textLower === 'accept all' || textLower === 'accetta tutto') {
+                    isExpand || text === 'requires input' || textLower === 'accept all' || textLower === 'accetta tutto') {
                     return clickable;
                 }
             }
@@ -557,9 +561,10 @@ async function checkPermissionButtons() {
                             lastClickedTime = now;
 
                             // 3. Trigger Standby if loop confirmed
-                            if (consecutiveClickCount > 5 || consecutiveFingerprintCount > 3) {
+                            // Rilassiamo le soglie: 10 click consecutivi o 6 fingerprint uguali
+                            if (consecutiveClickCount > 10 || consecutiveFingerprintCount > 6) {
                                 log(`[CDP] 🔴 LOOP CONFIRMED: Btn="${btnText}" (${consecutiveClickCount}x), Fingerprint="${fingerprint}" (${consecutiveFingerprintCount}x) via "${selector}"`);
-                                vscode.window.showWarningMessage(`⏳ AutoRun Pro: Deterministic loop detected. Standing by.`);
+                                vscode.window.showWarningMessage(`⏳ AutoRun Pro: Anti-Loop standby engaged for safety.`);
                                 isStandby = true;
                                 standbyButton = btnText;
                                 updateStatusBar();

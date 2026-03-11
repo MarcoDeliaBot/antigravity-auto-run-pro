@@ -1,3 +1,12 @@
+## [1.6.4] - 2026-03-11
+
+### Fixed
+- Ottimizzata la gestione dell'Anti-Loop: soglie più permissive per evitare blocchi spuri durante operazioni legittime.
+- Migliorata la logica di rilevamento del pulsante `Expand` per supportare pulsanti con icone o simboli aggiuntivi.
+- Aggiunto logging diagnostico per il Webview Guard.
+
+---
+
 ## [1.6.3] - 2026-03-11
 
 ### Fixed

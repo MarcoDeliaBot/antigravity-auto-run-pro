@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Antigravity Mock Panel</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #1e1e1e; color: #ccc; }
+        .agent-container { border: 1px solid #333; padding: 10px; margin-bottom: 20px; }
+        .message { margin-bottom: 20px; padding: 10px; border-left: 3px solid #555; }
+        .assistant { border-color: #007acc; }
+        button { background: #333; color: white; border: 1px solid #555; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
+        button:hover { background: #444; }
+        .clicked { border-color: #0f0 !important; background: #040 !important; }
+    </style>
+</head>
+<body class="antigravity-agent-side-panel">
+    <h1>Antigravity Mock Panel (Test v1.6.3)</h1>
+    
+    <div class="agent-container">
+        <div class="message assistant" data-testid="assistant-message">
+            <p>I will now execute some commands and accept steps.</p>
+            
+            <div class="actions">
+                <button onclick="this.classList.add('clicked')">Run</button>
+                <button onclick="this.classList.add('clicked')">Accept</button>
+                <button onclick="this.classList.add('clicked')">Esegui</button>
+                <button onclick="this.classList.add('clicked')">Accetta</button>
+            </div>
+        </div>
+
+        <div class="message assistant" data-testid="assistant-message">
+            <p>New buttons added in 1.6.3:</p>
+            <div class="actions">
+                <button onclick="this.classList.add('clicked')">Expand</button>
+                <button onclick="this.classList.add('clicked')">Requires input</button>
+                <button onclick="this.classList.add('clicked')">Espandi</button>
+                <button onclick="this.classList.add('clicked')">Richiede input</button>
+            </div>
+        </div>
+
+        <div class="message assistant" data-testid="assistant-message">
+            <p>Unsafe buttons (God Mode):</p>
+            <div class="actions">
+                <button onclick="this.classList.add('clicked')">Allow</button>
+                <button onclick="this.classList.add('clicked')" data-testid="always-allow">Always allow</button>
+            </div>
+        </div>
+
+        <div class="message assistant" data-testid="assistant-message">
+            <p>False positives (Should NOT be clicked):</p>
+            <div class="actions">
+                <button onclick="this.classList.add('clicked')">Test Runner for Java</button>
+                <button onclick="this.classList.add('clicked')">Running tasks...</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Track clicks for verification
+        window.clickedButtons = [];
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                window.clickedButtons.push(btn.textContent.trim());
+                console.log('Button clicked:', btn.textContent.trim());
+            });
+        });
+    </script>
+</body>
+</html>
