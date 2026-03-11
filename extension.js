@@ -1,4 +1,4 @@
-// AntiGravity AutoAccept v1.5.6
+// AntiGravity AutoAccept v1.6.6
 // Primary: VS Code Commands API with async lock
 // Secondary: Shadow DOM-piercing CDP for permission & action buttons
 
@@ -564,7 +564,13 @@ async function checkPermissionButtons() {
 
                             // 3. Trigger Standby if loop confirmed
                             // Soglie ultra-permissive: 15 click consecutivi o 10 fingerprint uguali
-                            if (consecutiveClickCount > 15 || consecutiveFingerprintCount > 10) {
+                            // Per i pulsanti di "espansione" (Expand/Espandi), diventiamo ancora più permissivi 
+                            // perché spesso non cambiano il fingerprint del messaggio.
+                            const isExpandBtn = (btnText === 'expand' || btnText === 'espandi');
+                            const loopThreshold = isExpandBtn ? 30 : 15;
+                            const fingerprintThreshold = isExpandBtn ? 100 : 10;
+
+                            if (consecutiveClickCount > loopThreshold || consecutiveFingerprintCount > fingerprintThreshold) {
                                 log(`[CDP] 🔴 LOOP CONFIRMED: Btn="${btnText}" (${consecutiveClickCount}x), Fingerprint="${fingerprint}" (${consecutiveFingerprintCount}x) via "${selector}"`);
                                 vscode.window.showWarningMessage(`⏳ AutoRun Pro: Anti-Loop standby engaged for safety.`);
                                 isStandby = true;

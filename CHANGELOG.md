@@ -1,3 +1,10 @@
+## [1.6.6] - 2026-03-11
+
+### Fixed
+- **Anti-Loop Optimization (Expand/Espandi)**: Aumentate drasticamente le soglie di tolleranza per i pulsanti di espansione dell'interfaccia. Precedentemente, il sistema poteva entrare in STANDBY erroneamente perché il click su "Expand" non cambiava il contenuto del messaggio (fingerprint), venendo scambiato per un loop. Ora questi pulsanti hanno soglie dedicate molto più alte.
+
+---
+
 ## [1.6.5] - 2026-03-11
 
 ### Fixed
