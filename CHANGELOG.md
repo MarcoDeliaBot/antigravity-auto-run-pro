@@ -1,3 +1,13 @@
+## [1.6.1] - 2026-03-11
+
+### Fixed
+- **Hash Deterministico (Robust Loop Detection)**: Sostituito il confronto parziale del testo con una funzione di hashing deterministica (`djb2`) per identificare con precisione millimetrica l'output ripetuto dell'AI.
+- **Exponential Backoff Reale**: Il sistema di attesa dopo i click ora segue una progressione esponenziale reale (3s, 6s, 12s, 24s... fino a 60s) invece che lineare, garantendo un freno molto più efficace in caso di loop.
+- **Selettori UI con Fallback Chain**: Introdotta una catena di selettori DOM multipli per individuare l'output dell'assistente, rendendo l'estensione resiliente ai futuri cambiamenti dell'interfaccia di Antigravity.
+- **Logging Metadati Avanzato**: I log ora includono il fingerprint dell'output, il livello di backoff raggiunto e il selettore DOM utilizzato con successo.
+
+---
+
 ## [1.6.0] - 2026-03-11
 
 ### Added

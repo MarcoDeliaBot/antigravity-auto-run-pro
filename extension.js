@@ -174,23 +174,47 @@ function buildPermissionScript(customTexts, godMode, standbyButton) {
         return 'generating';
     }
 
-    // ═══ AI OUTPUT LOOP DETECTION (Hash / Tracking) ═══
-    // Find the last message from the agent to check if it's stuck in a loop proposing the same fix
-    var lastAgentBubble = document.querySelector('[data-testid="assistant-message"]:last-of-type') || 
-                          document.querySelector('.antigravity-message.assistant:last-child');
-    var agentOutputSnippet = '';
-    if (lastAgentBubble) {
-        agentOutputSnippet = (lastAgentBubble.textContent || '').substring(0, 100).replace(/\s+/g, '');
+    // ═══ DETERMINISTIC FINGERPRINTING (Hash) ═══
+    function getHashCode(str) {
+        var hash = 0;
+        for (var i = 0; i < str.length; i++) {
+            var char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return hash.toString(16);
     }
+
+    // ═══ ROBUST UI SELECTORS (Fallback Chain) ═══
+    function getAssistantOutput() {
+        var selectors = [
+            '[data-testid="assistant-message"]:last-of-type',
+            '.antigravity-message.assistant:last-child',
+            '[class*="assistant-message"]:last-child',
+            '[class*="agent-message"]:last-child',
+            'div[class*="message"]:last-child' // Broad fallback
+        ];
+        for (var s = 0; s < selectors.length; s++) {
+            var el = document.querySelector(selectors[s]);
+            if (el && el.textContent.trim().length > 5) {
+                return { text: el.textContent.trim(), selector: selectors[s] };
+            }
+        }
+        return null;
+    }
+
+    var outputData = getAssistantOutput();
+    var fingerprint = outputData ? getHashCode(outputData.text) : 'no-output';
+    var selectorUsed = outputData ? outputData.selector : 'none';
     
     for (var t = 0; t < BUTTON_TEXTS.length; t++) {
         var btn = findButton(document.body, BUTTON_TEXTS[t]);
         if (btn) {
             if (STANDBY_BUTTON === BUTTON_TEXTS[t]) {
-                return 'standby-present:' + BUTTON_TEXTS[t] + '|' + agentOutputSnippet;
+                return 'standby-present:' + BUTTON_TEXTS[t] + '|' + fingerprint + '|' + selectorUsed;
             }
             btn.click();
-            return 'clicked:' + BUTTON_TEXTS[t] + '|' + agentOutputSnippet;
+            return 'clicked:' + BUTTON_TEXTS[t] + '|' + fingerprint + '|' + selectorUsed;
         }
     }
     return 'no-permission-button';
@@ -205,11 +229,14 @@ let isGodMode = false;   // God Mode — also auto-accept folder access prompts
 let isStandby = false;
 let standbyButton = null;
 
-// ═══ GLOBAL ANTI-LOOP VARS ═══
+// ═══ GLOBAL ANTI-LOOP VARS (v1.6.1) ═══
 let globalCooldownUntil = 0; // Debouncing/Cooldown timestamp
 let sessionClickCount = 0;   // Kill switch counter
 let sessionStartTime = Date.now();
-// ═════════════════════════════
+// Backoff Constants
+const BACKOFF_BASE_MS = 3000;
+const BACKOFF_MAX_MS = 60000; // Max 1 minute wait
+// ═══════════════════════════════════════
 
 let pollIntervalId = null;
 let cdpIntervalId = null;
@@ -450,8 +477,9 @@ let isCheckingCDP = false;
 let lastClickedButton = null;
 let lastClickedTime = 0;
 let consecutiveClickCount = 0;
-let lastAgentSnippet = '';
-let consecutiveSnippetCount = 0;
+let lastAgentFingerprint = '';
+let consecutiveFingerprintCount = 0;
+let lastUsedSelector = 'none';
 
 async function checkPermissionButtons() {
     if (!isEnabled || isCheckingCDP) return;
@@ -484,52 +512,52 @@ async function checkPermissionButtons() {
                     try {
                         const result = await cdpEvaluate(pages[i].webSocketDebuggerUrl, script);
                         if (result && result.startsWith('clicked:')) {
-                            // Format: clicked:btntext|snippet
+                            // Format: clicked:btntext|fingerprint|selector
                             const parts = result.substring(8).split('|');
                             const btnText = parts[0];
-                            const snippet = parts[1] || '';
+                            const fingerprint = parts[1] || '';
+                            const selector = parts[2] || 'unknown';
                             const now = Date.now();
 
-                            // ═══ SESSION KILL SWITCH (Max actions / time limit) ═══
+                            // ═══ SESSION KILL SWITCH ═══
                             sessionClickCount++;
                             if (now - sessionStartTime > 120000) { 
-                                // Reset session counter every 2 minutes
                                 sessionStartTime = now;
                                 sessionClickCount = 0;
                             }
                             if (sessionClickCount > 20) {
-                                log(`[CDP] 🔴 KILL SWITCH ENGAGED: Max actions exceeded (20 actions in < 2 mins). Halting extension.`);
-                                vscode.window.showErrorMessage(`🚨 AutoRun Pro Lockdown: Too many actions in quick succession. Automation stopped to prevent Google Ban.`);
-                                vscode.commands.executeCommand('autorunpro.toggle'); // Disable itself
+                                log(`[CDP] 🔴 KILL SWITCH: 20 actions in < 2min. Lockdown engaged.`);
+                                vscode.window.showErrorMessage(`🚨 AutoRun Pro Lockdown: Excessive activity detected. Security halt.`);
+                                vscode.commands.executeCommand('autorunpro.toggle');
                                 isCheckingCDP = false;
                                 return;
                             }
 
-                            // ═══ ANTI INFINITE LOOP & EXPONENTIAL BACKOFF ═══
-                            let isLooping = false;
+                            // ═══ ANTI-LOOP LOGIC (v1.6.1) ═══
                             
-                            // Check same button clicks
-                            if (btnText === lastClickedButton && (now - lastClickedTime) < 5000) {
+                            // 1. Button Loop Check
+                            if (btnText === lastClickedButton && (now - lastClickedTime) < 10000) {
                                 consecutiveClickCount++;
                             } else {
-                                lastClickedButton = btnText;
                                 consecutiveClickCount = 1;
+                                lastClickedButton = btnText;
                             }
                             
-                            // Check same output from Agent (AI getting stuck)
-                            if (snippet && snippet === lastAgentSnippet) {
-                                consecutiveSnippetCount++;
+                            // 2. Output Fingerprint Check (Deterministic Loop Detection)
+                            if (fingerprint !== 'no-output' && fingerprint === lastAgentFingerprint) {
+                                consecutiveFingerprintCount++;
                             } else {
-                                lastAgentSnippet = snippet;
-                                consecutiveSnippetCount = 1;
+                                consecutiveFingerprintCount = 1;
+                                lastAgentFingerprint = fingerprint;
+                                lastUsedSelector = selector;
                             }
 
                             lastClickedTime = now;
 
-                            if (consecutiveClickCount > 5 || consecutiveSnippetCount > 3) {
-                                isLooping = true;
-                                log(`[CDP] 🔴 Loop detected: Button "${btnText}" clicked ${consecutiveClickCount}x, Snippet repeated ${consecutiveSnippetCount}x.`);
-                                vscode.window.showWarningMessage(`⏳ AutoRun Pro: Loop detected. Standby mode active.`);
+                            // 3. Trigger Standby if loop confirmed
+                            if (consecutiveClickCount > 5 || consecutiveFingerprintCount > 3) {
+                                log(`[CDP] 🔴 LOOP CONFIRMED: Btn="${btnText}" (${consecutiveClickCount}x), Fingerprint="${fingerprint}" (${consecutiveFingerprintCount}x) via "${selector}"`);
+                                vscode.window.showWarningMessage(`⏳ AutoRun Pro: Deterministic loop detected. Standing by.`);
                                 isStandby = true;
                                 standbyButton = btnText;
                                 updateStatusBar();
@@ -537,12 +565,13 @@ async function checkPermissionButtons() {
                                 return;
                             }
 
-                            // Apply Cooldown (Backoff)
-                            // Base 3 seconds. Adds +2 seconds progressive for each consecutive click
-                            const progressiveCooldown = 3000 + (consecutiveClickCount * 2000);
-                            globalCooldownUntil = now + progressiveCooldown;
+                            // ═══ REAL EXPONENTIAL BACKOFF ═══
+                            // Base * 2^(n-1). n=1 -> 3s, n=2 -> 6s, n=3 -> 12s... max 60s
+                            const backoffLevel = Math.max(consecutiveClickCount, consecutiveFingerprintCount);
+                            const expBackoff = Math.min(BACKOFF_MAX_MS, BACKOFF_BASE_MS * Math.pow(2, backoffLevel - 1));
+                            globalCooldownUntil = now + expBackoff;
 
-                            log(`[CDP] ✓ Clicked: "${btnText}" [Loop factor: ${consecutiveClickCount}, Next cooldown: ${progressiveCooldown}ms]`);
+                            log(`[CDP] ✓ Clicked: "${btnText}" [Fingerprint: ${fingerprint}] [Level: ${backoffLevel}, Cooldown: ${expBackoff}ms]`);
                             isCheckingCDP = false;
                             return;
                         } else if (result === 'generating') {
