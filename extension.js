@@ -153,6 +153,26 @@ function buildPermissionScript(customTexts, godMode, standbyButton) {
         }
         return null;
     }
+    // ═══ GENERATION CHECK ═══
+    function isGenerating() {
+        var walkers = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+        var n;
+        while ((n = walkers.nextNode())) {
+            var text = (n.textContent || '').trim().toLowerCase();
+            if (n.tagName === 'BUTTON' && (text === 'interrupt' || text === 'stop generating' || text === 'cancel' || text === 'interrompi')) {
+                return true;
+            }
+            if (n.getAttribute('data-testid') === 'interrupt-button' || n.getAttribute('aria-label') === 'Interrupt') {
+                return true;
+            }
+            // Check for typical loaders or generating indicators if needed
+        }
+        return false;
+    }
+
+    if (isGenerating()) {
+        return 'generating';
+    }
     
     for (var t = 0; t < BUTTON_TEXTS.length; t++) {
         var btn = findButton(document.body, BUTTON_TEXTS[t]);
@@ -473,6 +493,10 @@ async function checkPermissionButtons() {
                             log(`[CDP] ✓ ${result} (count: ${consecutiveClickCount})`);
                             isCheckingCDP = false;
                             return;
+                        } else if (result === 'generating') {
+                            // Agent is busy generating content. Wait.
+                            isCheckingCDP = false;
+                            return;
                         } else if (result && result.startsWith('standby-present:')) {
                             // Still in standby, button still there. Do nothing.
                             isCheckingCDP = false;
@@ -511,49 +535,73 @@ async function checkPermissionButtons() {
     isCheckingCDP = false;
 }
 
-// ─── Polling with Async Lock ──────────────────────────────────────────
+// ─── Polling with Async Lock and Jitter ─────────────────────────────────
+let isPollingActive = false;
+
+function getRandomJitter(base, variationPercent) {
+    const variation = base * variationPercent;
+    return base + (Math.random() * variation * 2 - variation);
+}
+
 function startPolling() {
-    if (pollIntervalId) return;
+    if (isPollingActive) return;
+    isPollingActive = true;
 
     const config = vscode.workspace.getConfiguration('autorunpro');
-    const interval = config.get('pollInterval', 500);
-    log(`Polling started (every ${interval}ms, ${ACCEPT_COMMANDS.length} commands)`);
+    const baseInterval = config.get('pollInterval', 500);
+    log(`Polling started (Base interval ${baseInterval}ms, ${ACCEPT_COMMANDS.length} commands, with jitter)`);
 
-    // VS Code commands — with async lock to prevent double-accepts
-    pollIntervalId = setInterval(async () => {
-        if (!isEnabled || isAccepting || isStandby) return;
-        isAccepting = true;
-        try {
-            const results = await Promise.allSettled(
-                ACCEPT_COMMANDS.map(cmd => vscode.commands.executeCommand(cmd))
-            );
+    // VS Code commands mapping - recursive setTimeout
+    async function runVsCodePolling() {
+        if (!isPollingActive || !isEnabled) return;
+        
+        if (!isAccepting && !isStandby) {
+            isAccepting = true;
+            try {
+                const results = await Promise.allSettled(
+                    ACCEPT_COMMANDS.map(cmd => vscode.commands.executeCommand(cmd))
+                );
 
-            // Log real errors safely
-            results.forEach((res, idx) => {
-                if (res.status === 'rejected') {
-                    const errMsg = (res.reason && res.reason.message) ? res.reason.message : String(res.reason);
-                    // Silently ignore expected "command not found" or context-unavailing errors
-                    if (!errMsg.toLowerCase().includes('not found') && !errMsg.toLowerCase().includes('not enabled')) {
-                        logThrottled(`vs-cmd-${idx}`, `[VSCode API] ⚠️ Cmd ${ACCEPT_COMMANDS[idx]} rejected: ${errMsg}`);
+                results.forEach((res, idx) => {
+                    if (res.status === 'rejected') {
+                        const errMsg = (res.reason && res.reason.message) ? res.reason.message : String(res.reason);
+                        if (!errMsg.toLowerCase().includes('not found') && !errMsg.toLowerCase().includes('not enabled')) {
+                            logThrottled(`vs-cmd-${idx}`, `[VSCode API] \u26A0\uFE0F Cmd ${ACCEPT_COMMANDS[idx]} rejected: ${errMsg}`);
+                        }
                     }
-                }
-            });
-        } catch (e) {
-            logThrottled('vs-cmd-fatal', `[VSCode API] 🔴 Fatal polling error: ${(e && e.message) ? e.message : String(e)}`);
-        } finally {
-            isAccepting = false;
+                });
+            } catch (e) {
+                logThrottled('vs-cmd-fatal', `[VSCode API] \uD83D\uDD34 Fatal polling error: ${(e && e.message) ? e.message : String(e)}`);
+            } finally {
+                isAccepting = false;
+            }
         }
-    }, interval);
+        
+        // Schedule next run with ±30% jitter
+        const nextDelay = getRandomJitter(baseInterval, 0.3);
+        pollIntervalId = setTimeout(runVsCodePolling, nextDelay);
+    }
 
-    // CDP permission polling (slower cadence)
-    cdpIntervalId = setInterval(() => {
-        checkPermissionButtons();
-    }, 1500);
+    // CDP permission polling mapping - recursive setTimeout
+    async function runCdpPolling() {
+        if (!isPollingActive || !isEnabled) return;
+        
+        await checkPermissionButtons();
+        
+        // Slower cadence for CDP, e.g., base 1500ms with ±20% jitter
+        const nextDelay = getRandomJitter(1500, 0.2);
+        cdpIntervalId = setTimeout(runCdpPolling, nextDelay);
+    }
+
+    // Kick off the loops
+    runVsCodePolling();
+    runCdpPolling();
 }
 
 function stopPolling() {
-    if (pollIntervalId) { clearInterval(pollIntervalId); pollIntervalId = null; }
-    if (cdpIntervalId) { clearInterval(cdpIntervalId); cdpIntervalId = null; }
+    isPollingActive = false;
+    if (pollIntervalId) { clearTimeout(pollIntervalId); pollIntervalId = null; }
+    if (cdpIntervalId) { clearTimeout(cdpIntervalId); cdpIntervalId = null; }
     isAccepting = false;
     log('Polling stopped');
 }

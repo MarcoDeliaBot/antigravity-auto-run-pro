@@ -1,3 +1,11 @@
+## [1.5.9] - 2026-03-11
+
+### Added
+- Introduzione del controllo dello stato UI: l'estensione ora verifica se l'agente sta attivamente generando testo ("generating") ed evita i loop di click in quella fase.
+- Randomizzazione (Jitter) degli intervalli di polling (`setTimeout` casuali invece di `setInterval` fissi) per eludere meccanismi di rilevazione anti-bot ed evitare i blocchi account.
+
+---
+
 ## [1.5.8] - 2026-03-09
 
 ### Changed
