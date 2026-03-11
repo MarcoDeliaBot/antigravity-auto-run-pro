@@ -173,15 +173,24 @@ function buildPermissionScript(customTexts, godMode, standbyButton) {
     if (isGenerating()) {
         return 'generating';
     }
+
+    // ═══ AI OUTPUT LOOP DETECTION (Hash / Tracking) ═══
+    // Find the last message from the agent to check if it's stuck in a loop proposing the same fix
+    var lastAgentBubble = document.querySelector('[data-testid="assistant-message"]:last-of-type') || 
+                          document.querySelector('.antigravity-message.assistant:last-child');
+    var agentOutputSnippet = '';
+    if (lastAgentBubble) {
+        agentOutputSnippet = (lastAgentBubble.textContent || '').substring(0, 100).replace(/\s+/g, '');
+    }
     
     for (var t = 0; t < BUTTON_TEXTS.length; t++) {
         var btn = findButton(document.body, BUTTON_TEXTS[t]);
         if (btn) {
             if (STANDBY_BUTTON === BUTTON_TEXTS[t]) {
-                return 'standby-present:' + BUTTON_TEXTS[t];
+                return 'standby-present:' + BUTTON_TEXTS[t] + '|' + agentOutputSnippet;
             }
             btn.click();
-            return 'clicked:' + BUTTON_TEXTS[t];
+            return 'clicked:' + BUTTON_TEXTS[t] + '|' + agentOutputSnippet;
         }
     }
     return 'no-permission-button';
@@ -195,6 +204,13 @@ let isAccepting = false; // Async lock — prevents double-accepts
 let isGodMode = false;   // God Mode — also auto-accept folder access prompts
 let isStandby = false;
 let standbyButton = null;
+
+// ═══ GLOBAL ANTI-LOOP VARS ═══
+let globalCooldownUntil = 0; // Debouncing/Cooldown timestamp
+let sessionClickCount = 0;   // Kill switch counter
+let sessionStartTime = Date.now();
+// ═════════════════════════════
+
 let pollIntervalId = null;
 let cdpIntervalId = null;
 let statusBarItem = null;
@@ -434,6 +450,8 @@ let isCheckingCDP = false;
 let lastClickedButton = null;
 let lastClickedTime = 0;
 let consecutiveClickCount = 0;
+let lastAgentSnippet = '';
+let consecutiveSnippetCount = 0;
 
 async function checkPermissionButtons() {
     if (!isEnabled || isCheckingCDP) return;
@@ -466,31 +484,65 @@ async function checkPermissionButtons() {
                     try {
                         const result = await cdpEvaluate(pages[i].webSocketDebuggerUrl, script);
                         if (result && result.startsWith('clicked:')) {
-                            const btnText = result.substring(8);
+                            // Format: clicked:btntext|snippet
+                            const parts = result.substring(8).split('|');
+                            const btnText = parts[0];
+                            const snippet = parts[1] || '';
                             const now = Date.now();
 
-                            // ═══ ANTI INFINITE LOOP ═══
-                            if (config.get('antiLoopProtection', true)) {
-                                if (btnText === lastClickedButton && (now - lastClickedTime) < 3000) {
-                                    consecutiveClickCount++;
-                                } else {
-                                    lastClickedButton = btnText;
-                                    consecutiveClickCount = 1;
-                                }
-                                lastClickedTime = now;
-
-                                if (consecutiveClickCount > 5) {
-                                    log(`[CDP] 🔴 Loop detected for "${btnText}". Entering STANDBY mode.`);
-                                    vscode.window.showWarningMessage(`⏳ AntiGravity AutoRun: Loop detected on "${btnText}". Standing by until the prompt changes.`);
-                                    isStandby = true;
-                                    standbyButton = btnText;
-                                    updateStatusBar();
-                                    isCheckingCDP = false;
-                                    return;
-                                }
+                            // ═══ SESSION KILL SWITCH (Max actions / time limit) ═══
+                            sessionClickCount++;
+                            if (now - sessionStartTime > 120000) { 
+                                // Reset session counter every 2 minutes
+                                sessionStartTime = now;
+                                sessionClickCount = 0;
+                            }
+                            if (sessionClickCount > 20) {
+                                log(`[CDP] 🔴 KILL SWITCH ENGAGED: Max actions exceeded (20 actions in < 2 mins). Halting extension.`);
+                                vscode.window.showErrorMessage(`🚨 AutoRun Pro Lockdown: Too many actions in quick succession. Automation stopped to prevent Google Ban.`);
+                                vscode.commands.executeCommand('autorunpro.toggle'); // Disable itself
+                                isCheckingCDP = false;
+                                return;
                             }
 
-                            log(`[CDP] ✓ ${result} (count: ${consecutiveClickCount})`);
+                            // ═══ ANTI INFINITE LOOP & EXPONENTIAL BACKOFF ═══
+                            let isLooping = false;
+                            
+                            // Check same button clicks
+                            if (btnText === lastClickedButton && (now - lastClickedTime) < 5000) {
+                                consecutiveClickCount++;
+                            } else {
+                                lastClickedButton = btnText;
+                                consecutiveClickCount = 1;
+                            }
+                            
+                            // Check same output from Agent (AI getting stuck)
+                            if (snippet && snippet === lastAgentSnippet) {
+                                consecutiveSnippetCount++;
+                            } else {
+                                lastAgentSnippet = snippet;
+                                consecutiveSnippetCount = 1;
+                            }
+
+                            lastClickedTime = now;
+
+                            if (consecutiveClickCount > 5 || consecutiveSnippetCount > 3) {
+                                isLooping = true;
+                                log(`[CDP] 🔴 Loop detected: Button "${btnText}" clicked ${consecutiveClickCount}x, Snippet repeated ${consecutiveSnippetCount}x.`);
+                                vscode.window.showWarningMessage(`⏳ AutoRun Pro: Loop detected. Standby mode active.`);
+                                isStandby = true;
+                                standbyButton = btnText;
+                                updateStatusBar();
+                                isCheckingCDP = false;
+                                return;
+                            }
+
+                            // Apply Cooldown (Backoff)
+                            // Base 3 seconds. Adds +2 seconds progressive for each consecutive click
+                            const progressiveCooldown = 3000 + (consecutiveClickCount * 2000);
+                            globalCooldownUntil = now + progressiveCooldown;
+
+                            log(`[CDP] ✓ Clicked: "${btnText}" [Loop factor: ${consecutiveClickCount}, Next cooldown: ${progressiveCooldown}ms]`);
                             isCheckingCDP = false;
                             return;
                         } else if (result === 'generating') {
@@ -555,6 +607,13 @@ function startPolling() {
     async function runVsCodePolling() {
         if (!isPollingActive || !isEnabled) return;
         
+        const now = Date.now();
+        if (now < globalCooldownUntil) {
+            // In cooldown, skip checking APIs but reschedule
+            pollIntervalId = setTimeout(runVsCodePolling, 500);
+            return;
+        }
+
         if (!isAccepting && !isStandby) {
             isAccepting = true;
             try {
@@ -562,12 +621,17 @@ function startPolling() {
                     ACCEPT_COMMANDS.map(cmd => vscode.commands.executeCommand(cmd))
                 );
 
+                let anyAccepted = false;
                 results.forEach((res, idx) => {
                     if (res.status === 'rejected') {
                         const errMsg = (res.reason && res.reason.message) ? res.reason.message : String(res.reason);
                         if (!errMsg.toLowerCase().includes('not found') && !errMsg.toLowerCase().includes('not enabled')) {
                             logThrottled(`vs-cmd-${idx}`, `[VSCode API] \u26A0\uFE0F Cmd ${ACCEPT_COMMANDS[idx]} rejected: ${errMsg}`);
                         }
+                    } else if (res.status === 'fulfilled') {
+                        // In VS Code extensions it's hard to know if executeCommand actually did something 
+                        // just by 'fulfilled', but if we wanted to register a cooldown we could do it here
+                        // However we rely mainly on CDP for the strong cooldowns for visible actions
                     }
                 });
             } catch (e) {
@@ -586,7 +650,10 @@ function startPolling() {
     async function runCdpPolling() {
         if (!isPollingActive || !isEnabled) return;
         
-        await checkPermissionButtons();
+        const now = Date.now();
+        if (now >= globalCooldownUntil) {
+            await checkPermissionButtons();
+        }
         
         // Slower cadence for CDP, e.g., base 1500ms with ±20% jitter
         const nextDelay = getRandomJitter(1500, 0.2);

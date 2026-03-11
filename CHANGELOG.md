@@ -1,3 +1,13 @@
+## [1.6.0] - 2026-03-11
+
+### Added
+- **Kill Switch / Lockdown Mode**: L'estensione si disabilita automaticamente se rileva un picco anomalo di operazioni (es. > 20 click in 2 minuti) per prevenire ban da parte delle API esterne.
+- **Debouncing e Cooldown Progressivo (Exponential Backoff)**: Ogni azione critica instaura un blocco temporale. In caso di loop su errori ripetuti, il tempo di attesa tra un click e l'altro aumenta progressivamente (+2 secondi a ogni iterazione continua).
+- **Rilevamento Loop dell'Output AI (Hash check)**: Ora l'estensione estrae un frammento del testo generato dall'Agente (AI output snippet). Se l'Agente è in loop logico e propone la stessa soluzione errata per più di 3 volte, l'automazione blocca la chat in Standby prima di esaurire l'account.
+- **Logging Diagnostico Avanzato**: Inclusione del conteggio retry e cooldown previsti all'interno di `autorun_pro.log` per semplificare il debug.
+
+---
+
 ## [1.5.9] - 2026-03-11
 
 ### Added
