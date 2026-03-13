@@ -1,3 +1,9 @@
+## [1.6.7] - 2026-03-13
+
+### Fixed
+- **Anti-Loop Optimization (Always Run)**: Aumentata la soglia di tolleranza per i pulsanti "Always Run" e "Esegui sempre" a 30 click (come per il pulsante Expand), riducendo i falsi positivi di standby durante le operazioni repetitive.
+- **Diagnostics**: Corretta la stringa di versione riportata nei log diagnostici.
+
 ## [1.6.6] - 2026-03-11
 
 ### Fixed
