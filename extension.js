@@ -111,6 +111,9 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
         if (target === 'accetta' && (nodeText === 'accetta tutto' || nodeText.startsWith('accetta tutto'))) return true;
         // Longer targets (3+ chars) can use startsWith for multi-word buttons
         if (target.length >= 6 && nodeText.startsWith(target)) return true;
+        // Handle "1 step requires input" or localized variants
+        if (target === 'requires input' && nodeText.includes('requires input')) return true;
+        if (target === 'richiede input' && nodeText.includes('richiede input')) return true;
         return false;
     }
     
@@ -863,7 +866,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.7.0 "Industrial Pro")');
+    log('Extension activating (v1.7.1 "Industrial Pro")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);

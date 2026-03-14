@@ -1,7 +1,9 @@
-## [1.7.0] - 2026-03-14
+## [1.7.1] - 2026-03-14
 
-### Added
-- **Industrial Pro Engine**: Passaggio a un'architettura di classe industriale con motore CDP ottimizzato.
+### Fixed
+- **Stall Resolution (Requires Input)**: Migliorato il riconoscimento dei bottoni di stato dell'agente. Ora l'estensione clicca correttamente anche quando il testo include prefissi numerici (es. "1 Step Requires Input", "2 Steps..."), eliminando lo stallo segnalato dagli utenti.
+
+## [1.7.0] - 2026-03-14
 - **Zero-Focus-Theft**: Protezione nativa degli eventi di focus per impedire a VS Code di interferire durante l'automazione.
 - **Button Tagging**: Implementata la marcatura degli elementi DOM (`data-ag-clicked`) per prevenire click duplicati con precisione chirurgica.
 - **Rich Dashboard**: Il tooltip della StatusBar ora mostra statistiche in tempo reale, stato della connessione CDP e cronologia azioni.
