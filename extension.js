@@ -1,7 +1,7 @@
-// AntiGravity AutoAccept v1.7.3 "The Overtaker"
+// AntiGravity AutoAccept v1.7.4 "The Overtaker"
 // Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
 // Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode
-// Fixes v1.7.3: cdpAttempted/watchdogTimer ReferenceError, expanded SAFE_TEXTS, tolerant textMatches
+// Fixes v1.7.4: Expand button not clicked during "Waiting.." state (tagging exemption for re-clickable buttons)
 
 const vscode = require('vscode');
 const http = require('http');
@@ -92,7 +92,7 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
         var el = node;
         while (el && el !== document.body) {
             var tag = (el.tagName || '').toLowerCase();
-            if (tag === 'button' || tag.includes('button') || tag.includes('btn') ||
+            if (tag === 'button' || tag === 'a' || tag.includes('button') || tag.includes('btn') ||
                 el.getAttribute('role') === 'button' || el.classList.contains('cursor-pointer') ||
                 el.onclick || el.getAttribute('tabindex') === '0') {
                 return el;
@@ -251,7 +251,18 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
             }
             
             // Industrial Tagging Check
-            if (btn.getAttribute('data-ag-clicked') === fingerprint) {
+            // FIX v1.7.4: Exempt re-clickable buttons (expand, collapse, requires input,
+            // changes overview) from the tagging guard. These are idempotent UI toggles
+            // that MUST be re-clicked even when the agent output (fingerprint) hasn't changed,
+            // e.g. during the "Waiting.." state where "1 Step Requires Input — Expand" persists.
+            var isReClickable = (
+                BUTTON_TEXTS[t] === 'expand' || BUTTON_TEXTS[t] === 'espandi' ||
+                BUTTON_TEXTS[t] === 'expand all' || BUTTON_TEXTS[t] === 'espandi tutto' ||
+                BUTTON_TEXTS[t] === 'collapse all' || BUTTON_TEXTS[t] === 'comprimi tutto' ||
+                BUTTON_TEXTS[t] === 'requires input' || BUTTON_TEXTS[t] === 'richiede input' ||
+                BUTTON_TEXTS[t] === 'changes overview' || BUTTON_TEXTS[t] === 'panoramica modifiche'
+            );
+            if (!isReClickable && btn.getAttribute('data-ag-clicked') === fingerprint) {
                 return 'already-clicked:' + BUTTON_TEXTS[t];
             }
 
@@ -354,7 +365,7 @@ function updateStatusBar() {
     
     // Industrial Dashboard Tooltip
     const dashboard = [
-        `Antigravity Auto Run Pro v1.7.3`,
+        `Antigravity Auto Run Pro v1.7.4`,
         `───────────────────────────`,
         `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
         `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
@@ -926,7 +937,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.7.3 "The Overtaker")');
+    log('Extension activating (v1.7.4 "The Overtaker")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);

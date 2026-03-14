@@ -1,3 +1,9 @@
+## [1.7.4] - 2026-03-14
+
+### Fixed
+- **Expand Button Stuck on "Waiting.."**: Risolto bug critico dove il pulsante "Expand" nella barra "1 Step Requires Input" non veniva cliccato perché il meccanismo di tagging anti-duplicato (`data-ag-clicked`) lo bloccava quando il fingerprint dell'output dell'AI non cambiava. I pulsanti expand, collapse, requires input e changes overview sono ora esenti dal tagging e possono essere ri-cliccati liberamente.
+- **Anchor Tag Detection**: Migliorato `closestClickable` per riconoscere anche elementi `<a>` come target cliccabili, coprendo strutture DOM alternative della UI Gemini.
+
 ## [1.7.3] - 2026-03-14
 
 ### Fixed
