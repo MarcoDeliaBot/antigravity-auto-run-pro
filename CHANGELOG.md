@@ -1,3 +1,11 @@
+## [1.7.3] - 2026-03-14
+
+### Fixed
+- **CDP Stability**: Corretti bug critici `cdpAttempted` e `watchdogTimer` (ReferenceError) che causavano crash silenziosi del loop di polling.
+- **Enhanced Expansion**: Aggiunto supporto completo per i pulsanti "Expand all", "Collapse all" e le varianti italiane nell'interfaccia dell'agente.
+- **Robust Text Matching**: Implementata la normalizzazione del testo per gestire icone SVG annidate e spazi multipli nei pulsanti.
+- **Anti-Loop Calibration**: Aggiornate le soglie di tolleranza per i nuovi pulsanti di espansione per prevenire attivazioni errate della modalità Standby.
+
 ## [1.7.2] - 2026-03-14
 
 ### Added

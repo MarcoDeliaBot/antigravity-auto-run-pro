@@ -1,6 +1,7 @@
-// AntiGravity AutoAccept v1.7.2 "The Overtaker"
+// AntiGravity AutoAccept v1.7.3 "The Overtaker"
 // Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
 // Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode
+// Fixes v1.7.3: cdpAttempted/watchdogTimer ReferenceError, expanded SAFE_TEXTS, tolerant textMatches
 
 const vscode = require('vscode');
 const http = require('http');
@@ -32,7 +33,9 @@ const SAFE_TEXTS = [
     'continua', 'procedi',
     'always run', 'esegui sempre', // Agent Manager persistent auto-run
     'allow once', 'consenti una volta', // Browser domain permission prompts
-    'expand', 'espandi', // Agent status 'Expand' buttons
+    'expand', 'espandi',             // Agent status 'Expand' buttons (short form)
+    'expand all', 'collapse all',    // FIX v1.7.3: full-text variants seen in agent UI
+    'espandi tutto', 'comprimi tutto', // FIX v1.7.3: Italian full-text variants
     'requires input', 'richiede input', // Agent status 'Requires input' buttons
     'changes overview', 'panoramica modifiche', // Antigravity IDE pending file changes button
 ];
@@ -102,19 +105,31 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
     // ═══ STRICT MATCH ═══
     // Match button text strictly: exact match, or known prefix patterns
     // like "run alt+d", "accept all", "esegui alt+d"
+    // FIX v1.7.3: strip leading/trailing whitespace and collapse inner spaces
+    //             to tolerate buttons that embed icon elements between text nodes.
+    function normalizeText(str) {
+        return (str || '').replace(/\\s+/g, ' ').trim().toLowerCase();
+    }
+
     function textMatches(nodeText, target) {
-        if (nodeText === target) return true;
+        var n = normalizeText(nodeText);
+        var t = normalizeText(target);
+        if (n === t) return true;
         // Allow "run alt+..." or "esegui alt+..." (keyboard shortcut suffix)
-        if (nodeText.startsWith(target + ' alt+')) return true;
-        if (nodeText.startsWith(target + ' ctrl+')) return true;
+        if (n.startsWith(t + ' alt+')) return true;
+        if (n.startsWith(t + ' ctrl+')) return true;
         // Allow "accept all" for target "accept"
-        if (target === 'accept' && (nodeText === 'accept all' || nodeText.startsWith('accept all'))) return true;
-        if (target === 'accetta' && (nodeText === 'accetta tutto' || nodeText.startsWith('accetta tutto'))) return true;
-        // Longer targets (3+ chars) can use startsWith for multi-word buttons
-        if (target.length >= 6 && nodeText.startsWith(target)) return true;
+        if (t === 'accept' && (n === 'accept all' || n.startsWith('accept all'))) return true;
+        if (t === 'accetta' && (n === 'accetta tutto' || n.startsWith('accetta tutto'))) return true;
+        // FIX v1.7.3: expand / collapse variants — match if node text starts with or equals target
+        // Covers "Expand all", "Expand All", "expand all steps", etc.
+        if ((t === 'expand' || t === 'espandi') && (n === 'expand all' || n === 'espandi tutto' || n.startsWith('expand') || n.startsWith('espandi'))) return true;
+        if ((t === 'collapse' || t === 'comprimi') && (n === 'collapse all' || n === 'comprimi tutto' || n.startsWith('collapse') || n.startsWith('comprimi'))) return true;
+        // Longer targets (6+ chars) can use startsWith for multi-word buttons
+        if (t.length >= 6 && n.startsWith(t)) return true;
         // Handle "1 step requires input" or localized variants
-        if (target === 'requires input' && nodeText.includes('requires input')) return true;
-        if (target === 'richiede input' && nodeText.includes('richiede input')) return true;
+        if (t === 'requires input' && n.includes('requires input')) return true;
+        if (t === 'richiede input' && n.includes('richiede input')) return true;
         return false;
     }
     
@@ -142,16 +157,26 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
             // "Test Runner for Java" or the IDE "Run" menu
             var directText = getDirectText(node);
             var fullText = (node.textContent || '').trim().toLowerCase();
+            // FIX v1.7.3: for expand/collapse targets always try fullText too
+            //             because the icon <svg> sits between text nodes, making
+            //             directText incomplete (e.g. "" instead of "Expand all").
+            var isExpandTarget = (text === 'expand' || text === 'espandi' ||
+                                  text === 'expand all' || text === 'espandi tutto' ||
+                                  text === 'collapse' || text === 'comprimi' ||
+                                  text === 'collapse all' || text === 'comprimi tutto');
             // For short targets like 'run', use DIRECT text only
-            // For longer targets, allow full textContent as fallback
-            var checkText = text.length <= 4 ? directText : (directText || fullText.substring(0, 40));
+            // For longer targets or expand targets, allow full textContent as fallback
+            var checkText = (text.length <= 4 && !isExpandTarget)
+                ? directText
+                : (directText || fullText.substring(0, 60));
             
             if (textMatches(checkText, text)) {
                 var clickable = closestClickable(node);
                 var tag2 = (clickable.tagName || '').toLowerCase();
                 // Enhanced match for 'expand' and permission buttons with specific Antigravity patterns
-                var textLower = (clickable.textContent || '').trim().toLowerCase();
-                var isExpand = (text === 'expand' || text === 'espandi' || textLower.includes('expand') || textLower.includes('espandi'));
+                var textLower = (clickable.textContent || '').replace(/\\s+/g, ' ').trim().toLowerCase();
+                var isExpand = isExpandTarget || textLower.includes('expand') || textLower.includes('espandi') ||
+                               textLower.includes('collapse') || textLower.includes('comprimi');
                 var isPermission = (text.includes('allow') || text.includes('consenti'));
                 
                 if (tag2 === 'button' || tag2.includes('button') || clickable.getAttribute('role') === 'button' || 
@@ -329,7 +354,7 @@ function updateStatusBar() {
     
     // Industrial Dashboard Tooltip
     const dashboard = [
-        `Antigravity Auto Run Pro v1.7.0`,
+        `Antigravity Auto Run Pro v1.7.3`,
         `───────────────────────────`,
         `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
         `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
@@ -578,16 +603,19 @@ async function checkPermissionButtons() {
     const config = vscode.workspace.getConfiguration('autorunpro');
     const customTexts = config.get('customButtonTexts', []);
     const script = buildPermissionScript(customTexts, isGodMode, standbyButton, isAuditMode, currentSessionId);
-    let anyConnected = false;
-    cdpStatus = 'Disconnected'; // Initialize status
+    let anyConnected = false;   // true = at least one CDP port responded (HTTP)
+    let cdpAttempted = false;   // FIX v1.7.3: true = found at least one page/target
+    let watchdogTimer = null;   // FIX v1.7.3: declared here so finally{} clearTimeout is safe
+    cdpStatus = 'Disconnected';
 
     try {
         for (const port of CDP_PORTS) {
             try {
                 const pages = await cdpGetPages(port);
+                anyConnected = true;                    // port responded to HTTP
                 if (pages.length === 0) continue;
-                anyConnected = true;
-                cdpStatus = `Connected (Port ${port})`; // Update status on successful connection
+                cdpAttempted = true;                    // FIX v1.7.3: found targets
+                cdpStatus = `Connected (Port ${port})`;
 
                 for (let i = 0; i < pages.length; i++) {
                     try {
@@ -625,8 +653,11 @@ async function checkPermissionButtons() {
                                 }
                                 lastClickedTime = now;
 
+                                // FIX v1.7.3: include all expand/collapse variants in high-tolerance set
                                 const isHighToleranceBtn = (
-                                    btnText === 'expand' || btnText === 'espandi' || 
+                                    btnText === 'expand' || btnText === 'espandi' ||
+                                    btnText === 'expand all' || btnText === 'espandi tutto' ||
+                                    btnText === 'collapse all' || btnText === 'comprimi tutto' ||
                                     btnText === 'always run' || btnText === 'esegui sempre' ||
                                     btnText.includes('allow') || btnText.includes('consenti')
                                 );
@@ -664,12 +695,14 @@ async function checkPermissionButtons() {
         if (!anyConnected) {
             logThrottled('cdp-no-connect', '[CDP] 🔴 Could not connect to any CDP port. Is Debug Mode disabled?', 60000);
         } else if (!cdpAttempted) {
+            // FIX v1.7.3: cdpAttempted is now properly declared above — no more ReferenceError
             logThrottled('cdp-no-pages', '[CDP] ⚠️ Connected to Debug port, but no webview targets found.', 60000);
         }
 
     } catch (e) {
         logThrottled('cdp-fatal', `[CDP] 🔴 Fatal error in polling: ${e.message}`, 60000);
     } finally {
+        // FIX v1.7.3: watchdogTimer is now declared as null above — clearTimeout(null) is a no-op, safe
         clearTimeout(watchdogTimer);
     }
 
@@ -893,7 +926,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.7.2 "The Overtaker")');
+    log('Extension activating (v1.7.3 "The Overtaker")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
