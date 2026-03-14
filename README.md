@@ -17,6 +17,7 @@ Finding the right automation tool is crucial. **Antigravity Auto Run Pro** was b
 - **100% Reliability**: Rock-solid background processes that never miss a prompt.
 - **Localized OS Support**: Supports native button prompts across all IDE localizations (English, Italian, etc.).
 - **Easy Toggle Switch**: Activate or deactivate **Antigravity Auto Run Pro** on-the-fly using the bottom-right status bar icon, or the `Ctrl+Alt+Shift+R` (`Cmd+Alt+Shift+R` on Mac) shortcut.
+- **Timer Bypass (v1.6.8+)**: A specialized button `$(zap) Skip Xs` appears in the status bar during exponential backoff cooldowns. Click it to immediately bypass the wait and resume automation.
 - **God Mode (Optional)**: When enabled, also auto-accepts parent folder access prompts (`Allow`, `Always Allow`, `Consenti`). **Disabled by default for safety.** Toggle via the `$(flame) GOD` status bar icon or `Ctrl+Alt+Shift+G`.
 
 ## God Mode ⚠️
