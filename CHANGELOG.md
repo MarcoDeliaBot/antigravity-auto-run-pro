@@ -1,9 +1,10 @@
+## [1.7.2] - 2026-03-14
+
+### Added
+- **Overtaker Mode**: Implementato pool di WebSocket persistenti (Caching) per azzerare la latenza di handshake CDP.
+- **Proactive Auto-Click**: Aggiunto supporto per il pulsante "Changes Overview" (Panoramica modifiche), eliminando un noto punto di stallo manuale dell'IDE.
+
 ## [1.7.1] - 2026-03-14
-
-### Fixed
-- **Stall Resolution (Requires Input)**: Migliorato il riconoscimento dei bottoni di stato dell'agente. Ora l'estensione clicca correttamente anche quando il testo include prefissi numerici (es. "1 Step Requires Input", "2 Steps..."), eliminando lo stallo segnalato dagli utenti.
-
-## [1.7.0] - 2026-03-14
 - **Zero-Focus-Theft**: Protezione nativa degli eventi di focus per impedire a VS Code di interferire durante l'automazione.
 - **Button Tagging**: Implementata la marcatura degli elementi DOM (`data-ag-clicked`) per prevenire click duplicati con precisione chirurgica.
 - **Rich Dashboard**: Il tooltip della StatusBar ora mostra statistiche in tempo reale, stato della connessione CDP e cronologia azioni.

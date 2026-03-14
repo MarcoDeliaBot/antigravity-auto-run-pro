@@ -1,5 +1,5 @@
-// AntiGravity AutoAccept v1.7.0 "Industrial Pro"
-// Primary: Persistent CDP WebSocket engine with Shadow DOM piercing
+// AntiGravity AutoAccept v1.7.2 "The Overtaker"
+// Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
 // Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode
 
 const vscode = require('vscode');
@@ -34,6 +34,7 @@ const SAFE_TEXTS = [
     'allow once', 'consenti una volta', // Browser domain permission prompts
     'expand', 'espandi', // Agent status 'Expand' buttons
     'requires input', 'richiede input', // Agent status 'Requires input' buttons
+    'changes overview', 'panoramica modifiche', // Antigravity IDE pending file changes button
 ];
 
 // Unsafe texts: only auto-accepted in God Mode (parent folder access)
@@ -381,6 +382,8 @@ function updateBypassStatusBar() {
 
 
 // ─── CDP Helpers ──────────────────────────────────────────────────────
+const wsPool = new Map(); // Industrial WebSocket Pool (Zero Latency)
+
 function cdpGetPages(port) {
     return new Promise((resolve, reject) => {
         const req = http.get({ hostname: '127.0.0.1', port, path: '/json/list', timeout: 500 }, (res) => {
@@ -398,20 +401,44 @@ function cdpGetPages(port) {
 
 function cdpEvaluate(wsUrl, expression) {
     return new Promise((resolve, reject) => {
-        const ws = new WebSocket(wsUrl);
-        const timeout = setTimeout(() => { ws.close(); reject(new Error('timeout')); }, 2000);
-        ws.on('open', () => {
+        let ws = wsPool.get(wsUrl);
+        
+        // Eviction logic: check if existing socket is still open
+        if (ws && ws.readyState !== WebSocket.OPEN) {
+            try { ws.close(); } catch(e) {}
+            wsPool.delete(wsUrl);
+            ws = null;
+        }
+
+        if (!ws) {
+            ws = new WebSocket(wsUrl);
+            wsPool.set(wsUrl, ws);
+            ws.on('error', () => { wsPool.delete(wsUrl); });
+            ws.on('close', () => { wsPool.delete(wsUrl); });
+        }
+
+        const timeout = setTimeout(() => { resolve(null); }, 1500);
+        
+        const onMessage = (data) => {
+            try {
+                const msg = JSON.parse(data.toString());
+                if (msg.id === 1) {
+                    clearTimeout(timeout);
+                    ws.removeListener('message', onMessage);
+                    resolve(msg.result?.result?.value || '');
+                }
+            } catch (e) { resolve(null); }
+        };
+
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.on('message', onMessage);
             ws.send(JSON.stringify({ id: 1, method: 'Runtime.evaluate', params: { expression } }));
-        });
-        ws.on('message', (data) => {
-            const msg = JSON.parse(data.toString());
-            if (msg.id === 1) {
-                clearTimeout(timeout);
-                ws.close();
-                resolve(msg.result?.result?.value || '');
-            }
-        });
-        ws.on('error', () => { clearTimeout(timeout); reject(new Error('ws-error')); });
+        } else {
+            ws.on('open', () => {
+                ws.on('message', onMessage);
+                ws.send(JSON.stringify({ id: 1, method: 'Runtime.evaluate', params: { expression } }));
+            });
+        }
     });
 }
 
@@ -866,7 +893,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.7.1 "Industrial Pro")');
+    log('Extension activating (v1.7.2 "The Overtaker")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
