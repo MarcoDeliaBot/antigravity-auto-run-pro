@@ -26,7 +26,9 @@ const script = `
     // Check if this is the agent panel
     var isAgent = !!document.querySelector('.react-app-container') ||
                   !!document.querySelector('[class*="agent"]') ||
-                  !!document.querySelector('[data-vscode-context]');
+                  !!document.querySelector('[data-vscode-context]') ||
+                  !!document.querySelector('.antigravity-agent-side-panel') ||
+                  !!document.querySelector('[class*="antigravity"]');
     
     var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
     var node;

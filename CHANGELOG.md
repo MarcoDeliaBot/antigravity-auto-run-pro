@@ -1,7 +1,9 @@
-## [1.6.8] - 2026-03-14
+## [1.6.9] - 2026-03-14
 
-### Added
-- **Timer Bypass (Bypass 3s)**: Aggiunto un pulsante piccolissimo nella StatusBar (icona ⚡ + countdown) che permette di saltare istantaneamente il tempo di attesa del backoff esponenziale. Utile per forzare l'automazione quando si sa che non c'è un loop reale.
+### Fixed
+- **God Mode Click Enhancement**: Potenzialmente risolto il problema del mancato click sui pulsanti di autorizzazione ("Allow This Conversation") in God Mode. Questi pulsanti sono stati aggiunti alla lista ad alta tolleranza anti-loop (30 click invece di 15) e la logica di riconoscimento è stata resa più robusta per gestire i ritardi della UI.
+
+## [1.6.8] - 2026-03-14
 
 ## [1.6.7] - 2026-03-13
 

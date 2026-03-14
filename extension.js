@@ -144,15 +144,15 @@ function buildPermissionScript(customTexts, godMode, standbyButton) {
             if (textMatches(checkText, text)) {
                 var clickable = closestClickable(node);
                 var tag2 = (clickable.tagName || '').toLowerCase();
+                // Enhanced match for 'expand' and permission buttons with specific Antigravity patterns
                 var textLower = (clickable.textContent || '').trim().toLowerCase();
-                
-                // Enhanced match for 'expand' with specific Antigravity patterns
                 var isExpand = (text === 'expand' || text === 'espandi' || textLower.includes('expand') || textLower.includes('espandi'));
+                var isPermission = (text.includes('allow') || text.includes('consenti'));
                 
                 if (tag2 === 'button' || tag2.includes('button') || clickable.getAttribute('role') === 'button' || 
                     tag2.includes('btn') || clickable.classList.contains('cursor-pointer') ||
                     clickable.onclick || clickable.getAttribute('tabindex') === '0' ||
-                    isExpand || text === 'requires input' || textLower === 'accept all' || textLower === 'accetta tutto') {
+                    isExpand || isPermission || text === 'requires input' || textLower === 'accept all' || textLower === 'accetta tutto') {
                     return clickable;
                 }
             }
@@ -578,9 +578,17 @@ async function checkPermissionButtons() {
 
                             // 3. Trigger Standby if loop confirmed
                             // Soglie ultra-permissive: 15 click consecutivi o 10 fingerprint uguali
-                            // Per i pulsanti di "espansione" (Expand/Espandi) e di Auto-Run (Always Run), 
-                            // diventiamo ancora più permissivi perché spesso non cambiano il fingerprint del messaggio.
-                            const isHighToleranceBtn = (btnText === 'expand' || btnText === 'espandi' || btnText === 'always run' || btnText === 'esegui sempre');
+                            // Per i pulsanti di "espansione" (Expand/Espandi), Auto-Run (Always Run) e Permission (Allow), 
+                            // diventiamo ancora più permissivi perché spesso non cambiano il fingerprint del messaggio 
+                            // o richiedono più tempo per essere elaborati dal backend/browser.
+                            const isHighToleranceBtn = (
+                                btnText === 'expand' || 
+                                btnText === 'espandi' || 
+                                btnText === 'always run' || 
+                                btnText === 'esegui sempre' ||
+                                btnText.includes('allow') ||
+                                btnText.includes('consenti')
+                            );
                             const loopThreshold = isHighToleranceBtn ? 30 : 15;
                             const fingerprintThreshold = isHighToleranceBtn ? 100 : 10;
 
