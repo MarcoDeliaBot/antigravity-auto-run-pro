@@ -1,9 +1,14 @@
+## [1.7.0] - 2026-03-14
+
+### Added
+- **Industrial Pro Engine**: Passaggio a un'architettura di classe industriale con motore CDP ottimizzato.
+- **Zero-Focus-Theft**: Protezione nativa degli eventi di focus per impedire a VS Code di interferire durante l'automazione.
+- **Button Tagging**: Implementata la marcatura degli elementi DOM (`data-ag-clicked`) per prevenire click duplicati con precisione chirurgica.
+- **Rich Dashboard**: Il tooltip della StatusBar ora mostra statistiche in tempo reale, stato della connessione CDP e cronologia azioni.
+- **Audit Mode**: Nuova modalità "Dry-run" per testare l'automazione senza eseguire click reali (Toggle via `autorunpro.toggleAudit`).
+- **Button Census**: Nuovo comando diagnostico per elencare tutti i pulsanti cliccabili trovati nel pannello dell'Agente.
+
 ## [1.6.9] - 2026-03-14
-
-### Fixed
-- **God Mode Click Enhancement**: Potenzialmente risolto il problema del mancato click sui pulsanti di autorizzazione ("Allow This Conversation") in God Mode. Questi pulsanti sono stati aggiunti alla lista ad alta tolleranza anti-loop (30 click invece di 15) e la logica di riconoscimento è stata resa più robusta per gestire i ritardi della UI.
-
-## [1.6.8] - 2026-03-14
 
 ## [1.6.7] - 2026-03-13
 

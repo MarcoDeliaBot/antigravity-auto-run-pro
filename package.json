@@ -10,7 +10,7 @@
         "free auto accept agent",
         "automation"
     ],
-    "version": "1.6.9",
+    "version": "1.7.0",
     "icon": "icon.png",
     "publisher": "marcodelia",
     "author": "Marco D'Elia",
@@ -48,6 +48,14 @@
             {
                 "command": "autorunpro.bypassTimer",
                 "title": "Bypass AutoRun Cooldown"
+            },
+            {
+                "command": "autorunpro.toggleAudit",
+                "title": "Toggle Audit Mode (Dry-run)"
+            },
+            {
+                "command": "autorunpro.census",
+                "title": "Run Button Census (Diagnose UI)"
             }
         ],
         "keybindings": [
@@ -69,6 +77,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "⚠️ God Mode: auto-accept parent folder access prompts (Allow, Always Allow, Consenti). DISABLED by default for safety — enabling this lets the agent access files outside your workspace without confirmation."
+                },
+                "autorunpro.auditMode": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "🔍 Audit Mode: Logs actions without actually clicking. Perfect for testing and safety."
                 },
                 "autorunpro.antiLoopProtection": {
                     "type": "boolean",

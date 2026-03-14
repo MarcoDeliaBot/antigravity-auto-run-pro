@@ -1,6 +1,6 @@
-// AntiGravity AutoAccept v1.6.8
-// Primary: VS Code Commands API with async lock
-// Secondary: Shadow DOM-piercing CDP for permission & action buttons
+// AntiGravity AutoAccept v1.7.0 "Industrial Pro"
+// Primary: Persistent CDP WebSocket engine with Shadow DOM piercing
+// Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode
 
 const vscode = require('vscode');
 const http = require('http');
@@ -43,7 +43,7 @@ const UNSAFE_TEXTS = [
     'consenti sempre', 'consenti in questa conversazione', 'consenti',
 ];
 
-function buildPermissionScript(customTexts, godMode, standbyButton) {
+function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, sessionId) {
     const allTexts = godMode
         ? [...SAFE_TEXTS, ...UNSAFE_TEXTS, ...customTexts]
         : [...SAFE_TEXTS, ...customTexts];
@@ -55,17 +55,18 @@ function buildPermissionScript(customTexts, godMode, standbyButton) {
     var STANDBY_BUTTON = ${standbyButton ? JSON.stringify(standbyButton) : 'null'};
     
     // ═══ WEBVIEW GUARD ═══
-    // Check for Antigravity agent panel DOM markers.
-    // Supports both legacy (.react-app-container) and current Antigravity
-    // versions (.antigravity-agent-side-panel in workbench.html).
-    // This prevents false positives on non-Antigravity browser pages.
     if (!document.querySelector('.react-app-container') && 
         !document.querySelector('[class*="agent"]') &&
         !document.querySelector('[data-vscode-context]') &&
         !document.querySelector('.antigravity-agent-side-panel') &&
         !document.querySelector('[class*="antigravity"]')) {
-        return 'not-agent-panel:' + (document.body ? document.body.className : 'no-body');
+        return 'not-agent-panel';
     }
+
+    // ═══ TAGGING & AUDIT MODE ═══
+    var AUDIT_MODE = ${auditMode ? 'true' : 'false'};
+    var SESSION_ID = "${sessionId}";
+
     
     // We are safely inside the isolated agent panel webview.
     // document.body IS the agent panel — no iframe needed.
@@ -219,7 +220,26 @@ function buildPermissionScript(customTexts, godMode, standbyButton) {
             if (STANDBY_BUTTON === BUTTON_TEXTS[t]) {
                 return 'standby-present:' + BUTTON_TEXTS[t] + '|' + fingerprint + '|' + selectorUsed;
             }
+            
+            // Industrial Tagging Check
+            if (btn.getAttribute('data-ag-clicked') === fingerprint) {
+                return 'already-clicked:' + BUTTON_TEXTS[t];
+            }
+
+            if (AUDIT_MODE) {
+                return 'audit-match:' + BUTTON_TEXTS[t] + '|' + fingerprint;
+            }
+
+            // Zero Focus Theft: Prevent blur/focus shift during click
+            var preventer = function(e) { e.stopPropagation(); };
+            btn.addEventListener('blur', preventer, true);
+            
             btn.click();
+            btn.setAttribute('data-ag-clicked', fingerprint);
+            btn.setAttribute('data-ag-session', SESSION_ID);
+            
+            setTimeout(function() { btn.removeEventListener('blur', preventer, true); }, 500);
+
             return 'clicked:' + BUTTON_TEXTS[t] + '|' + fingerprint + '|' + selectorUsed;
         }
     }
@@ -229,11 +249,21 @@ function buildPermissionScript(customTexts, godMode, standbyButton) {
 }
 
 
+
 let isEnabled = false;
-let isAccepting = false; // Async lock — prevents double-accepts
-let isGodMode = false;   // God Mode — also auto-accept folder access prompts
+let isAccepting = false;
+let isGodMode = false;
 let isStandby = false;
+let isAuditMode = false;
 let standbyButton = null;
+let currentSessionId = Math.random().toString(36).substring(2, 10);
+
+// Stats for Dashboard
+let totalClicks = 0;
+let lastActionTime = 0;
+let lastActionText = 'None';
+let cdpStatus = 'Disconnected';
+
 
 // ═══ GLOBAL ANTI-LOOP VARS (v1.6.1) ═══
 let globalCooldownUntil = 0; // Debouncing/Cooldown timestamp
@@ -292,36 +322,46 @@ function logThrottled(key, msg, throttleMs = 30000) {
 
 function updateStatusBar() {
     if (!statusBarItem) return;
+    
+    // Industrial Dashboard Tooltip
+    const dashboard = [
+        `Antigravity Auto Run Pro v1.7.0`,
+        `───────────────────────────`,
+        `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
+        `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
+        `Audit Mode: ${isAuditMode ? '🔍 ON' : 'OFF'}`,
+        `CDP Status: ${cdpStatus}`,
+        `───────────────────────────`,
+        `Session Stats:`,
+        `- Total Clicks: ${totalClicks}`,
+        `- Last Action: ${lastActionText}`,
+        `- Last Active: ${lastActionTime ? new Date(lastActionTime).toLocaleTimeString() : 'N/A'}`,
+        `- Backoff Level: ${Math.max(consecutiveClickCount, consecutiveFingerprintCount)}`,
+        `───────────────────────────`,
+        `Click to toggle ON/OFF`
+    ].join('\n');
+
+    statusBarItem.tooltip = dashboard;
+
     if (isEnabled) {
         if (isStandby) {
             statusBarItem.text = '$(clock) Auto: STANDBY';
             statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
-            statusBarItem.tooltip = 'AntiGravity AutoAccept is in STANDBY (loop detected) — will resume automatically';
         } else {
-            statusBarItem.text = '$(zap) Auto: ON';
+            statusBarItem.text = isAuditMode ? '$(search) Auto: AUDIT' : '$(zap) Auto: ON';
             statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
-            statusBarItem.tooltip = 'AntiGravity AutoAccept is ACTIVE — click to disable';
         }
     } else {
         statusBarItem.text = '$(circle-slash) Auto: OFF';
         statusBarItem.backgroundColor = undefined;
-        statusBarItem.tooltip = 'AntiGravity AutoAccept is OFF — click to enable';
     }
 }
 
 function updateGodModeStatusBar() {
     if (!godModeStatusBarItem) return;
-    if (isGodMode) {
-        godModeStatusBarItem.text = '$(flame) GOD';
-        godModeStatusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
-        godModeStatusBarItem.tooltip = '⚠️ God Mode ACTIVE — auto-accepting folder access prompts. Click to disable.';
-        godModeStatusBarItem.show();
-    } else {
-        godModeStatusBarItem.text = '$(shield) Safe';
-        godModeStatusBarItem.backgroundColor = undefined;
-        godModeStatusBarItem.tooltip = 'God Mode OFF — folder access prompts require manual approval. Click to enable.';
-        godModeStatusBarItem.show();
-    }
+    godModeStatusBarItem.text = isGodMode ? '$(flame) GOD' : '$(shield) Safe';
+    godModeStatusBarItem.backgroundColor = isGodMode ? new vscode.ThemeColor('statusBarItem.errorBackground') : undefined;
+    godModeStatusBarItem.show();
 }
 
 function updateBypassStatusBar() {
@@ -330,12 +370,12 @@ function updateBypassStatusBar() {
     if (isEnabled && globalCooldownUntil > now && !isStandby) {
         const remaining = Math.ceil((globalCooldownUntil - now) / 1000);
         bypassStatusBarItem.text = `$(zap) Skip ${remaining}s`;
-        bypassStatusBarItem.tooltip = `AutoRun is waiting for ${remaining}s — click to bypass now`;
         bypassStatusBarItem.show();
     } else {
         bypassStatusBarItem.hide();
     }
 }
+
 
 // ─── CDP Helpers ──────────────────────────────────────────────────────
 function cdpGetPages(port) {
@@ -505,121 +545,76 @@ async function checkPermissionButtons() {
     if (!isEnabled || isCheckingCDP) return;
     isCheckingCDP = true;
 
-    // CD Watchdog: If checking takes more than 10 seconds, reset the flag to prevent infinite hang
-    const watchdogTimer = setTimeout(() => {
-        if (isCheckingCDP) {
-            logThrottled('cdp-watchdog', '[CDP] 🔴 Watchdog: CDP check hung for 10s. Resetting state.', 60000);
-            isCheckingCDP = false;
-        }
-    }, 10000);
-
     const config = vscode.workspace.getConfiguration('autorunpro');
     const customTexts = config.get('customButtonTexts', []);
-    const script = buildPermissionScript(customTexts, isGodMode, standbyButton);
-    let cdpAttempted = false;
+    const script = buildPermissionScript(customTexts, isGodMode, standbyButton, isAuditMode, currentSessionId);
     let anyConnected = false;
+    cdpStatus = 'Disconnected'; // Initialize status
 
     try {
         for (const port of CDP_PORTS) {
             try {
                 const pages = await cdpGetPages(port);
-                anyConnected = true;
                 if (pages.length === 0) continue;
-                cdpAttempted = true;
+                anyConnected = true;
+                cdpStatus = `Connected (Port ${port})`; // Update status on successful connection
 
-                // Evaluate on all targets
                 for (let i = 0; i < pages.length; i++) {
                     try {
                         const result = await cdpEvaluate(pages[i].webSocketDebuggerUrl, script);
-                        if (result && result.startsWith('clicked:')) {
-                            // Format: clicked:btntext|fingerprint|selector
-                            const parts = result.substring(8).split('|');
+                        if (!result) continue;
+
+                        if (result.startsWith('clicked:') || result.startsWith('audit-match:')) {
+                            const isAudit = result.startsWith('audit-match:');
+                            const prefix = isAudit ? 'audit-match:' : 'clicked:';
+                            const parts = result.substring(prefix.length).split('|');
                             const btnText = parts[0];
                             const fingerprint = parts[1] || '';
                             const selector = parts[2] || 'unknown';
                             const now = Date.now();
 
-                            // ═══ SESSION KILL SWITCH ═══
-                            sessionClickCount++;
-                            if (now - sessionStartTime > 120000) { 
-                                sessionStartTime = now;
-                                sessionClickCount = 0;
-                            }
-                            if (sessionClickCount > 20) {
-                                log(`[CDP] 🔴 KILL SWITCH: 20 actions in < 2min. Lockdown engaged.`);
-                                vscode.window.showErrorMessage(`🚨 AutoRun Pro Lockdown: Excessive activity detected. Security halt.`);
-                                vscode.commands.executeCommand('autorunpro.toggle');
-                                isCheckingCDP = false;
-                                return;
-                            }
+                            if (!isAudit) {
+                                totalClicks++;
+                                lastActionTime = now;
+                                lastActionText = `Clicked "${btnText}"`;
+                                
+                                // Anti-loop Logic
+                                if (btnText === lastClickedButton && (now - lastClickedTime) < 10000) {
+                                    consecutiveClickCount++;
+                                } else {
+                                    consecutiveClickCount = 1;
+                                    lastClickedButton = btnText;
+                                }
 
-                            // ═══ ANTI-LOOP LOGIC (v1.6.1) ═══
-                            
-                            // 1. Button Loop Check
-                            if (btnText === lastClickedButton && (now - lastClickedTime) < 10000) {
-                                consecutiveClickCount++;
+                                if (fingerprint !== 'no-output' && fingerprint === lastAgentFingerprint) {
+                                    consecutiveFingerprintCount++;
+                                } else {
+                                    consecutiveFingerprintCount = 1;
+                                    consecutiveClickCount = 1;
+                                    lastAgentFingerprint = fingerprint;
+                                }
+                                lastClickedTime = now;
+
+                                const isHighToleranceBtn = (
+                                    btnText === 'expand' || btnText === 'espandi' || 
+                                    btnText === 'always run' || btnText === 'esegui sempre' ||
+                                    btnText.includes('allow') || btnText.includes('consenti')
+                                );
+                                const loopThreshold = isHighToleranceBtn ? 30 : 15;
+                                if (consecutiveClickCount > loopThreshold) {
+                                    log(`[CDP] 🔴 LOOP: ${btnText} (${consecutiveClickCount}x)`);
+                                    isStandby = true;
+                                    standbyButton = btnText;
+                                }
                             } else {
-                                consecutiveClickCount = 1;
-                                lastClickedButton = btnText;
-                            }
-                            
-                            // 2. Output Fingerprint Check (Deterministic Loop Detection)
-                            if (fingerprint !== 'no-output' && fingerprint === lastAgentFingerprint) {
-                                consecutiveFingerprintCount++;
-                            } else {
-                                // RESET COMPLETO se l'output cambia (Nuovo messaggio = nuova azione)
-                                consecutiveFingerprintCount = 1;
-                                consecutiveClickCount = 1; // Reset dei click se il messaggio è nuovo!
-                                lastAgentFingerprint = fingerprint;
-                                lastUsedSelector = selector;
+                                lastActionText = `Audit: Found "${btnText}"`;
+                                log(`[Audit] Found "${btnText}" [Hash: ${fingerprint}]`);
                             }
 
-                            lastClickedTime = now;
-
-                            // 3. Trigger Standby if loop confirmed
-                            // Soglie ultra-permissive: 15 click consecutivi o 10 fingerprint uguali
-                            // Per i pulsanti di "espansione" (Expand/Espandi), Auto-Run (Always Run) e Permission (Allow), 
-                            // diventiamo ancora più permissivi perché spesso non cambiano il fingerprint del messaggio 
-                            // o richiedono più tempo per essere elaborati dal backend/browser.
-                            const isHighToleranceBtn = (
-                                btnText === 'expand' || 
-                                btnText === 'espandi' || 
-                                btnText === 'always run' || 
-                                btnText === 'esegui sempre' ||
-                                btnText.includes('allow') ||
-                                btnText.includes('consenti')
-                            );
-                            const loopThreshold = isHighToleranceBtn ? 30 : 15;
-                            const fingerprintThreshold = isHighToleranceBtn ? 100 : 10;
-
-                            if (consecutiveClickCount > loopThreshold || consecutiveFingerprintCount > fingerprintThreshold) {
-                                log(`[CDP] 🔴 LOOP CONFIRMED: Btn="${btnText}" (${consecutiveClickCount}x), Fingerprint="${fingerprint}" (${consecutiveFingerprintCount}x) via "${selector}"`);
-                                vscode.window.showWarningMessage(`⏳ AutoRun Pro: Anti-Loop standby engaged for safety.`);
-                                isStandby = true;
-                                standbyButton = btnText;
-                                updateStatusBar();
-                                isCheckingCDP = false;
-                                return;
-                            }
-
-                            // ═══ REAL EXPONENTIAL BACKOFF ═══
-                            // Base * 2^(n-1). n=1 -> 3s, n=2 -> 6s, n=3 -> 12s... max 60s
-                            const backoffLevel = Math.max(consecutiveClickCount, consecutiveFingerprintCount);
-                            const expBackoff = Math.min(BACKOFF_MAX_MS, BACKOFF_BASE_MS * Math.pow(2, backoffLevel - 1));
-                            globalCooldownUntil = now + expBackoff;
-
-                            log(`[CDP] ✓ Clicked: "${btnText}" [Fingerprint: ${fingerprint}] [Level: ${backoffLevel}, Cooldown: ${expBackoff}ms]`);
+                            updateStatusBar();
                             isCheckingCDP = false;
                             return;
-                        } else if (result === 'generating') {
-                            // Agent is busy generating content. Wait.
-                            isCheckingCDP = false;
-                            return;
-                        } else if (result && result.startsWith('standby-present:')) {
-                            // Still in standby, button still there. Do nothing.
-                            isCheckingCDP = false;
-                            return;
-                        } else if (result === 'no-permission-button' || result === 'not-agent-panel') {
+                        } else if (result === 'no-permission-button') {
                             if (isStandby) {
                                 log(`[CDP] 🟢 Button disappeared. Exiting STANDBY mode.`);
                                 vscode.window.showInformationMessage(`▶️ AntiGravity AutoRun: Standby ended. Resuming auto-run.`);
@@ -628,7 +623,6 @@ async function checkPermissionButtons() {
                                 consecutiveClickCount = 0;
                                 updateStatusBar();
                             }
-                            // Continue to next page - do not return early!
                         }
                     } catch (e) {
                         logThrottled('cdp-eval-error', `[CDP] ⚠️ Eval error on port ${port}: ${e.message}`, 60000);
@@ -636,7 +630,6 @@ async function checkPermissionButtons() {
                 }
             } catch (e) { /* port not open, next port */ }
         }
-
         // If we reach here, we exhausted all ports
         if (!anyConnected) {
             logThrottled('cdp-no-connect', '[CDP] 🔴 Could not connect to any CDP port. Is Debug Mode disabled?', 60000);
@@ -870,7 +863,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.6.7)');
+    log('Extension activating (v1.7.0 "Industrial Pro")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -939,6 +932,45 @@ function activate(context) {
             log('Timer bypassed manually');
             globalCooldownUntil = 0;
             updateBypassStatusBar();
+        })
+    );
+
+    // Audit Mode toggle command
+    context.subscriptions.push(
+        vscode.commands.registerCommand('autorunpro.toggleAudit', () => {
+            isAuditMode = !isAuditMode;
+            log(`Audit Mode: ${isAuditMode ? 'ON 🔍' : 'OFF'}`);
+            updateStatusBar();
+            vscode.window.showInformationMessage(
+                `AntiGravity AutoAccept: Audit Mode ${isAuditMode ? 'ENABLED (Dry-run)' : 'DISABLED'}`
+            );
+        })
+    );
+
+    // Button Census command
+    context.subscriptions.push(
+        vscode.commands.registerCommand('autorunpro.census', async () => {
+            log('Running Button Census...');
+            const config = vscode.workspace.getConfiguration('autorunpro');
+            const customTexts = config.get('customButtonTexts', []);
+            const censusScript = buildPermissionScript(customTexts, true, null, true, 'census');
+            
+            let foundAny = false;
+            for (const port of CDP_PORTS) {
+                try {
+                    const pages = await cdpGetPages(port);
+                    for (const page of pages) {
+                        const result = await cdpEvaluate(page.webSocketDebuggerUrl, censusScript);
+                        if (result && result.startsWith('audit-match:')) {
+                            const btnText = result.split('|')[0].substring(12);
+                            log(`[Census] Port ${port} - Found actionable: "${btnText}"`);
+                            foundAny = true;
+                        }
+                    }
+                } catch (e) {}
+            }
+            if (!foundAny) log('[Census] No actionable buttons found in current targets.');
+            vscode.window.showInformationMessage('Button Census complete. Check output log for details.');
         })
     );
 
