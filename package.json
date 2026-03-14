@@ -10,7 +10,7 @@
         "free auto accept agent",
         "automation"
     ],
-    "version": "1.6.7",
+    "version": "1.6.8",
     "icon": "icon.png",
     "publisher": "marcodelia",
     "author": "Marco D'Elia",
@@ -44,6 +44,10 @@
             {
                 "command": "autorunpro.openLog",
                 "title": "AntiGravity Auto Run Pro: Open Log File"
+            },
+            {
+                "command": "autorunpro.bypassTimer",
+                "title": "Bypass AutoRun Cooldown"
             }
         ],
         "keybindings": [

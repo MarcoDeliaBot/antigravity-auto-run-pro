@@ -1,3 +1,8 @@
+## [1.6.8] - 2026-03-14
+
+### Added
+- **Timer Bypass (Bypass 3s)**: Aggiunto un pulsante piccolissimo nella StatusBar (icona ⚡ + countdown) che permette di saltare istantaneamente il tempo di attesa del backoff esponenziale. Utile per forzare l'automazione quando si sa che non c'è un loop reale.
+
 ## [1.6.7] - 2026-03-13
 
 ### Fixed

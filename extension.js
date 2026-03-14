@@ -1,4 +1,4 @@
-// AntiGravity AutoAccept v1.6.7
+// AntiGravity AutoAccept v1.6.8
 // Primary: VS Code Commands API with async lock
 // Secondary: Shadow DOM-piercing CDP for permission & action buttons
 
@@ -248,6 +248,7 @@ let pollIntervalId = null;
 let cdpIntervalId = null;
 let statusBarItem = null;
 let godModeStatusBarItem = null;
+let bypassStatusBarItem = null;
 let outputChannel = null;
 let extensionContext = null; // Global context for storage path
 
@@ -320,6 +321,19 @@ function updateGodModeStatusBar() {
         godModeStatusBarItem.backgroundColor = undefined;
         godModeStatusBarItem.tooltip = 'God Mode OFF — folder access prompts require manual approval. Click to enable.';
         godModeStatusBarItem.show();
+    }
+}
+
+function updateBypassStatusBar() {
+    if (!bypassStatusBarItem) return;
+    const now = Date.now();
+    if (isEnabled && globalCooldownUntil > now && !isStandby) {
+        const remaining = Math.ceil((globalCooldownUntil - now) / 1000);
+        bypassStatusBarItem.text = `$(zap) Skip ${remaining}s`;
+        bypassStatusBarItem.tooltip = `AutoRun is waiting for ${remaining}s — click to bypass now`;
+        bypassStatusBarItem.show();
+    } else {
+        bypassStatusBarItem.hide();
     }
 }
 
@@ -654,9 +668,11 @@ function startPolling() {
         const now = Date.now();
         if (now < globalCooldownUntil) {
             // In cooldown, skip checking APIs but reschedule
+            updateBypassStatusBar();
             pollIntervalId = setTimeout(runVsCodePolling, 500);
             return;
         }
+        updateBypassStatusBar();
 
         if (!isAccepting && !isStandby) {
             isAccepting = true;
@@ -698,6 +714,7 @@ function startPolling() {
         if (now >= globalCooldownUntil) {
             await checkPermissionButtons();
         }
+        updateBypassStatusBar();
         
         // Slower cadence for CDP, e.g., base 1500ms with ±20% jitter
         const nextDelay = getRandomJitter(1500, 0.2);
@@ -858,6 +875,12 @@ function activate(context) {
     godModeStatusBarItem.command = 'autorunpro.toggleGodMode';
     context.subscriptions.push(godModeStatusBarItem);
 
+    // Bypass timer status bar item
+    bypassStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 101);
+    bypassStatusBarItem.command = 'autorunpro.bypassTimer';
+    bypassStatusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+    context.subscriptions.push(bypassStatusBarItem);
+
     // Restore God Mode state from settings and persisted state
     const config = vscode.workspace.getConfiguration('autorunpro');
     isGodMode = config.get('godMode', false) || context.globalState.get('autorunproGodMode', false);
@@ -902,6 +925,15 @@ function activate(context) {
         })
     );
 
+    // Bypass timer command
+    context.subscriptions.push(
+        vscode.commands.registerCommand('autorunpro.bypassTimer', () => {
+            log('Timer bypassed manually');
+            globalCooldownUntil = 0;
+            updateBypassStatusBar();
+        })
+    );
+
     // Open Log File command
     context.subscriptions.push(
         vscode.commands.registerCommand('autorunpro.openLog', async () => {
@@ -932,6 +964,7 @@ function activate(context) {
             log('CDP not available — bot will not start until debug port is enabled');
         }
         updateStatusBar();
+        updateBypassStatusBar();
         log('Extension activated');
     });
 }
