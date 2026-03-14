@@ -1,3 +1,8 @@
+## [1.7.5] - 2026-03-14
+
+### Fixed
+- **Permission Prompt Loop Fix**: Risolto problema dove i prompt di permesso (come "Allow Once" per l'accesso alle cartelle) smettevano di essere cliccati dopo il primo tentativo fallito. Questi pulsanti sono ora esenti dal tagging anti-duplicato e vengono ri-cliccati finché il prompt non scompare.
+
 ## [1.7.4] - 2026-03-14
 
 ### Fixed

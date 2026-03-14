@@ -1,7 +1,7 @@
-// AntiGravity AutoAccept v1.7.4 "The Overtaker"
+// AntiGravity AutoAccept v1.7.5 "The Overtaker"
 // Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
 // Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode
-// Fixes v1.7.4: Expand button not clicked during "Waiting.." state (tagging exemption for re-clickable buttons)
+// Fixes v1.7.5: Permission prompts (Allow Once, etc.) not re-clicked during "Working.." (tagging exemption)
 
 const vscode = require('vscode');
 const http = require('http');
@@ -260,7 +260,8 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
                 BUTTON_TEXTS[t] === 'expand all' || BUTTON_TEXTS[t] === 'espandi tutto' ||
                 BUTTON_TEXTS[t] === 'collapse all' || BUTTON_TEXTS[t] === 'comprimi tutto' ||
                 BUTTON_TEXTS[t] === 'requires input' || BUTTON_TEXTS[t] === 'richiede input' ||
-                BUTTON_TEXTS[t] === 'changes overview' || BUTTON_TEXTS[t] === 'panoramica modifiche'
+                BUTTON_TEXTS[t] === 'changes overview' || BUTTON_TEXTS[t] === 'panoramica modifiche' ||
+                BUTTON_TEXTS[t].includes('allow') || BUTTON_TEXTS[t].includes('consenti')
             );
             if (!isReClickable && btn.getAttribute('data-ag-clicked') === fingerprint) {
                 return 'already-clicked:' + BUTTON_TEXTS[t];
@@ -365,7 +366,7 @@ function updateStatusBar() {
     
     // Industrial Dashboard Tooltip
     const dashboard = [
-        `Antigravity Auto Run Pro v1.7.4`,
+        `Antigravity Auto Run Pro v1.7.5`,
         `───────────────────────────`,
         `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
         `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
@@ -937,7 +938,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.7.4 "The Overtaker")');
+    log('Extension activating (v1.7.5 "The Overtaker")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
