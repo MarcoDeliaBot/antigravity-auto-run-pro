@@ -1,3 +1,13 @@
+## [1.7.6] - 2026-03-23
+
+### Fixed
+- **Critical: CDP Mutex Deadlock Fix** (`isCheckingCDP`): Spostato il rilascio della guardia mutex nel blocco `finally{}`. Precedentemente, se `cdpEvaluate()` andava in timeout o un `return` anticipato veniva eseguito, `isCheckingCDP` restava `true` per sempre — bloccando silenziosamente tutto il polling CDP fino al riavvio dell'estensione. **Questa era la causa principale del problema intermittente "smette di funzionare".**
+- **WebSocket Listener Leak**: Aggiunto `removeListener('message')` nel timeout di `cdpEvaluate()`. Precedentemente, listener non rimossi si accumulavano ad ogni chiamata fallita, causando rallentamento progressivo e risposte confuse.
+- **CDP Response Collision**: Sostituito l'ID hardcoded `1` con un contatore incrementale (`nextCdpId++`) per le chiamate `Runtime.evaluate`. Con il pool WebSocket, due chiamate sulla stessa connessione potevano confondere le risposte.
+- **WebSocket Orphan Leak**: Aggiunto `ws.close()` nei handler `error` di `clickBannerViaDom()` e `cdpSendMulti()` per chiudere le connessioni orfane in caso di errore.
+- **Deactivation Cleanup**: La funzione `deactivate()` ora chiude tutte le connessioni WebSocket nel pool e svuota la Map, prevenendo leak post-reload.
+- **Log Rotation**: Implementata rotazione automatica del file di log quando supera 1 MB, prevenendo crescita infinita del file su disco.
+
 ## [1.7.5] - 2026-03-14
 
 ### Fixed

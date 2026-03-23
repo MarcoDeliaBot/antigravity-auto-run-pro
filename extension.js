@@ -1,7 +1,7 @@
-// AntiGravity AutoAccept v1.7.5 "The Overtaker"
+// AntiGravity AutoAccept v1.7.6 "The Resilient"
 // Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
 // Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode
-// Fixes v1.7.5: Permission prompts (Allow Once, etc.) not re-clicked during "Working.." (tagging exemption)
+// Fixes v1.7.6: Critical stability fixes — mutex deadlock, WebSocket leak, CDP ID collision, log rotation
 
 const vscode = require('vscode');
 const http = require('http');
@@ -332,6 +332,9 @@ function log(msg) {
     logToFile(fullMsg);
 }
 
+// Max log file size before rotation (1 MB)
+const MAX_LOG_SIZE = 1 * 1024 * 1024;
+
 function logToFile(msg) {
     try {
         if (!extensionContext) return;
@@ -345,6 +348,18 @@ function logToFile(msg) {
         }
 
         const logPath = path.join(storagePath, 'autorun_pro.log');
+
+        // Log rotation: if file exceeds MAX_LOG_SIZE, keep only the last half
+        try {
+            const stats = fs.statSync(logPath);
+            if (stats.size > MAX_LOG_SIZE) {
+                const content = fs.readFileSync(logPath, 'utf8');
+                const lines = content.split('\n');
+                const half = Math.floor(lines.length / 2);
+                fs.writeFileSync(logPath, '--- LOG ROTATED ---\n' + lines.slice(half).join('\n'), 'utf8');
+            }
+        } catch (e) { /* file doesn't exist yet, that's fine */ }
+
         fs.appendFileSync(logPath, msg + '\n', 'utf8');
     } catch (e) {
         // Silent fail for logging
@@ -366,7 +381,7 @@ function updateStatusBar() {
     
     // Industrial Dashboard Tooltip
     const dashboard = [
-        `Antigravity Auto Run Pro v1.7.5`,
+        `Antigravity Auto Run Pro v1.7.6`,
         `───────────────────────────`,
         `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
         `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
@@ -420,6 +435,7 @@ function updateBypassStatusBar() {
 
 // ─── CDP Helpers ──────────────────────────────────────────────────────
 const wsPool = new Map(); // Industrial WebSocket Pool (Zero Latency)
+let nextCdpId = 1; // Incremental ID to avoid CDP response collisions
 
 function cdpGetPages(port) {
     return new Promise((resolve, reject) => {
@@ -454,26 +470,37 @@ function cdpEvaluate(wsUrl, expression) {
             ws.on('close', () => { wsPool.delete(wsUrl); });
         }
 
-        const timeout = setTimeout(() => { resolve(null); }, 1500);
-        
+        // FIX v1.7.6: Use incremental ID to prevent response collisions on pooled sockets
+        const callId = nextCdpId++;
+
         const onMessage = (data) => {
             try {
                 const msg = JSON.parse(data.toString());
-                if (msg.id === 1) {
+                if (msg.id === callId) {
                     clearTimeout(timeout);
                     ws.removeListener('message', onMessage);
                     resolve(msg.result?.result?.value || '');
                 }
-            } catch (e) { resolve(null); }
+            } catch (e) {
+                clearTimeout(timeout);
+                ws.removeListener('message', onMessage);
+                resolve(null);
+            }
         };
+
+        // FIX v1.7.6: Remove listener on timeout to prevent accumulation
+        const timeout = setTimeout(() => {
+            ws.removeListener('message', onMessage);
+            resolve(null);
+        }, 1500);
 
         if (ws.readyState === WebSocket.OPEN) {
             ws.on('message', onMessage);
-            ws.send(JSON.stringify({ id: 1, method: 'Runtime.evaluate', params: { expression } }));
+            ws.send(JSON.stringify({ id: callId, method: 'Runtime.evaluate', params: { expression } }));
         } else {
             ws.on('open', () => {
                 ws.on('message', onMessage);
-                ws.send(JSON.stringify({ id: 1, method: 'Runtime.evaluate', params: { expression } }));
+                ws.send(JSON.stringify({ id: callId, method: 'Runtime.evaluate', params: { expression } }));
             });
         }
     });
@@ -509,7 +536,8 @@ function cdpSendMulti(wsUrl, commands) {
                 }
             }
         });
-        ws.on('error', () => { clearTimeout(timeout); reject(new Error('ws-error')); });
+        // FIX v1.7.6: Close WebSocket on error to prevent orphaned connections
+        ws.on('error', () => { clearTimeout(timeout); ws.close(); reject(new Error('ws-error')); });
     });
 }
 
@@ -531,7 +559,8 @@ async function clickBannerViaDom(wsUrl) {
             const msg = JSON.parse(raw.toString());
             if (msg.id && handlers[msg.id]) handlers[msg.id](msg);
         });
-        ws.on('error', () => { clearTimeout(timeout); reject(new Error('ws-error')); });
+        // FIX v1.7.6: Close WebSocket on error to prevent orphaned connections
+        ws.on('error', () => { clearTimeout(timeout); ws.close(); reject(new Error('ws-error')); });
 
         ws.on('open', () => {
             // Step 1: Get full DOM tree piercing shadow DOMs
@@ -685,8 +714,7 @@ async function checkPermissionButtons() {
                             }
 
                             updateStatusBar();
-                            isCheckingCDP = false;
-                            return;
+                            return; // FIX v1.7.6: isCheckingCDP released by finally{}
                         } else if (result === 'no-permission-button') {
                             if (isStandby) {
                                 log(`[CDP] 🟢 Button disappeared. Exiting STANDBY mode.`);
@@ -714,11 +742,13 @@ async function checkPermissionButtons() {
     } catch (e) {
         logThrottled('cdp-fatal', `[CDP] 🔴 Fatal error in polling: ${e.message}`, 60000);
     } finally {
+        // FIX v1.7.6: ALWAYS release the mutex — prevents permanent CDP polling deadlock
+        // Previously isCheckingCDP could remain true if an exception or early return occurred,
+        // silently killing all CDP polling until extension restart.
+        isCheckingCDP = false;
         // FIX v1.7.3: watchdogTimer is now declared as null above — clearTimeout(null) is a no-op, safe
         clearTimeout(watchdogTimer);
     }
-
-    isCheckingCDP = false;
 }
 
 // ─── Polling with Async Lock and Jitter ─────────────────────────────────
@@ -938,7 +968,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.7.5 "The Overtaker")');
+    log('Extension activating (v1.7.6 "The Resilient")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -1086,6 +1116,11 @@ function activate(context) {
 
 function deactivate() {
     stopPolling();
+    // FIX v1.7.6: Close all pooled WebSocket connections to prevent leak on reload/deactivation
+    for (const [url, ws] of wsPool) {
+        try { ws.close(); } catch(e) {}
+    }
+    wsPool.clear();
     if (outputChannel) outputChannel.dispose();
 }
 
