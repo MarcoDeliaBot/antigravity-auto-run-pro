@@ -1,7 +1,7 @@
-// AntiGravity AutoAccept v1.7.6 "The Resilient"
+// AntiGravity AutoAccept v1.7.7 "The Unkillable"
 // Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
 // Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode
-// Fixes v1.7.6: Critical stability fixes — mutex deadlock, WebSocket leak, CDP ID collision, log rotation
+// Fixes v1.7.7: Immortal polling loops, CDP startup retry, WebSocket race guard, dead code removal
 
 const vscode = require('vscode');
 const http = require('http');
@@ -381,7 +381,7 @@ function updateStatusBar() {
     
     // Industrial Dashboard Tooltip
     const dashboard = [
-        `Antigravity Auto Run Pro v1.7.6`,
+        `Antigravity Auto Run Pro v1.7.7`,
         `───────────────────────────`,
         `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
         `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
@@ -494,135 +494,36 @@ function cdpEvaluate(wsUrl, expression) {
             resolve(null);
         }, 1500);
 
+        // FIX v1.7.7: Handle CONNECTING→CLOSED race.
+        // If the WebSocket transitions from CONNECTING to CLOSED without ever opening
+        // (e.g. connection refused), the 'open' callback never fires. Without an explicit
+        // error/close handler on the Promise path, we'd rely solely on the timeout.
+        // Adding these handlers ensures faster resolution and prevents stale pool entries.
+        const onConnectFail = () => {
+            clearTimeout(timeout);
+            ws.removeListener('message', onMessage);
+            wsPool.delete(wsUrl);
+            resolve(null);
+        };
+
         if (ws.readyState === WebSocket.OPEN) {
             ws.on('message', onMessage);
             ws.send(JSON.stringify({ id: callId, method: 'Runtime.evaluate', params: { expression } }));
-        } else {
-            ws.on('open', () => {
+        } else if (ws.readyState === WebSocket.CONNECTING) {
+            ws.once('open', () => {
+                ws.removeListener('error', onConnectFail);
+                ws.removeListener('close', onConnectFail);
                 ws.on('message', onMessage);
                 ws.send(JSON.stringify({ id: callId, method: 'Runtime.evaluate', params: { expression } }));
             });
+            ws.once('error', onConnectFail);
+            ws.once('close', onConnectFail);
+        } else {
+            // CLOSING or CLOSED — evict and fail fast
+            wsPool.delete(wsUrl);
+            clearTimeout(timeout);
+            resolve(null);
         }
-    });
-}
-
-// Send multiple CDP commands over one WebSocket connection
-function cdpSendMulti(wsUrl, commands) {
-    return new Promise((resolve, reject) => {
-        const ws = new WebSocket(wsUrl);
-        const timeout = setTimeout(() => { ws.close(); reject(new Error('timeout')); }, 3000);
-        const results = {};
-        let nextId = 1;
-        const pending = [];
-
-        ws.on('open', () => {
-            for (const cmd of commands) {
-                const id = nextId++;
-                cmd._id = id;
-                pending.push(id);
-                ws.send(JSON.stringify({ id, method: cmd.method, params: cmd.params || {} }));
-            }
-        });
-        ws.on('message', (data) => {
-            const msg = JSON.parse(data.toString());
-            if (msg.id) {
-                results[msg.id] = msg.result || msg.error;
-                const idx = pending.indexOf(msg.id);
-                if (idx !== -1) pending.splice(idx, 1);
-                if (pending.length === 0) {
-                    clearTimeout(timeout);
-                    ws.close();
-                    resolve(results);
-                }
-            }
-        });
-        // FIX v1.7.6: Close WebSocket on error to prevent orphaned connections
-        ws.on('error', () => { clearTimeout(timeout); ws.close(); reject(new Error('ws-error')); });
-    });
-}
-
-// Use CDP DOM protocol to pierce closed shadow DOMs and click the banner
-async function clickBannerViaDom(wsUrl) {
-    return new Promise((resolve, reject) => {
-        const ws = new WebSocket(wsUrl);
-        const timeout = setTimeout(() => { ws.close(); reject(new Error('timeout')); }, 3000);
-        let msgId = 1;
-
-        function send(method, params = {}) {
-            const id = msgId++;
-            ws.send(JSON.stringify({ id, method, params }));
-            return id;
-        }
-
-        const handlers = {};
-        ws.on('message', (raw) => {
-            const msg = JSON.parse(raw.toString());
-            if (msg.id && handlers[msg.id]) handlers[msg.id](msg);
-        });
-        // FIX v1.7.6: Close WebSocket on error to prevent orphaned connections
-        ws.on('error', () => { clearTimeout(timeout); ws.close(); reject(new Error('ws-error')); });
-
-        ws.on('open', () => {
-            // Step 1: Get full DOM tree piercing shadow DOMs
-            const docId = send('DOM.getDocument', { depth: -1, pierce: true });
-            handlers[docId] = (msg) => {
-                if (!msg.result) { clearTimeout(timeout); ws.close(); resolve(null); return; }
-
-                // Step 2: Search for "Expand" text near the banner
-                const searchId = send('DOM.performSearch', { query: 'Expand' });
-                handlers[searchId] = (msg2) => {
-                    const count = msg2.result?.resultCount || 0;
-                    if (count === 0) { clearTimeout(timeout); ws.close(); resolve(null); return; }
-
-                    // Step 3: Get search result nodes
-                    const getResultsId = send('DOM.getSearchResults', {
-                        searchId: msg2.result.searchId,
-                        fromIndex: 0,
-                        toIndex: Math.min(count, 10)
-                    });
-                    handlers[getResultsId] = (msg3) => {
-                        const nodeIds = msg3.result?.nodeIds || [];
-                        if (nodeIds.length === 0) { clearTimeout(timeout); ws.close(); resolve(null); return; }
-
-                        // Step 4: Try each node — get its box model and click at center
-                        let tried = 0;
-                        function tryNode(idx) {
-                            if (idx >= nodeIds.length) {
-                                clearTimeout(timeout); ws.close(); resolve(null); return;
-                            }
-                            const boxId = send('DOM.getBoxModel', { nodeId: nodeIds[idx] });
-                            handlers[boxId] = (boxMsg) => {
-                                tried++;
-                                const quad = boxMsg.result?.model?.content;
-                                if (!quad || quad.length < 4) {
-                                    tryNode(idx + 1); return; // not visible, try next
-                                }
-                                // Calculate center of the element
-                                const x = (quad[0] + quad[2] + quad[4] + quad[6]) / 4;
-                                const y = (quad[1] + quad[3] + quad[5] + quad[7]) / 4;
-                                if (x === 0 && y === 0) { tryNode(idx + 1); return; }
-
-                                // Step 5: Real mouse click at center coordinates
-                                const downId = send('Input.dispatchMouseEvent', {
-                                    type: 'mousePressed', x, y, button: 'left', clickCount: 1
-                                });
-                                handlers[downId] = () => {
-                                    const upId = send('Input.dispatchMouseEvent', {
-                                        type: 'mouseReleased', x, y, button: 'left', clickCount: 1
-                                    });
-                                    handlers[upId] = () => {
-                                        clearTimeout(timeout);
-                                        ws.close();
-                                        resolve(`clicked:expand-mouse[${Math.round(x)},${Math.round(y)}]`);
-                                    };
-                                };
-                            };
-                        }
-                        tryNode(0);
-                    };
-                };
-            };
-        });
     });
 }
 
@@ -768,63 +669,71 @@ function startPolling() {
     log(`Polling started (Base interval ${baseInterval}ms, ${ACCEPT_COMMANDS.length} commands, with jitter)`);
 
     // VS Code commands mapping - recursive setTimeout
+    // FIX v1.7.7: Entire body wrapped in try/catch — an unhandled exception must NEVER
+    // kill the recursive chain, otherwise polling stops permanently with no recovery.
     async function runVsCodePolling() {
         if (!isPollingActive || !isEnabled) return;
-        
-        const now = Date.now();
-        if (now < globalCooldownUntil) {
-            // In cooldown, skip checking APIs but reschedule
-            updateBypassStatusBar();
-            pollIntervalId = setTimeout(runVsCodePolling, 500);
-            return;
-        }
-        updateBypassStatusBar();
-
-        if (!isAccepting && !isStandby) {
-            isAccepting = true;
-            try {
-                const results = await Promise.allSettled(
-                    ACCEPT_COMMANDS.map(cmd => vscode.commands.executeCommand(cmd))
-                );
-
-                let anyAccepted = false;
-                results.forEach((res, idx) => {
-                    if (res.status === 'rejected') {
-                        const errMsg = (res.reason && res.reason.message) ? res.reason.message : String(res.reason);
-                        if (!errMsg.toLowerCase().includes('not found') && !errMsg.toLowerCase().includes('not enabled')) {
-                            logThrottled(`vs-cmd-${idx}`, `[VSCode API] \u26A0\uFE0F Cmd ${ACCEPT_COMMANDS[idx]} rejected: ${errMsg}`);
-                        }
-                    } else if (res.status === 'fulfilled') {
-                        // In VS Code extensions it's hard to know if executeCommand actually did something 
-                        // just by 'fulfilled', but if we wanted to register a cooldown we could do it here
-                        // However we rely mainly on CDP for the strong cooldowns for visible actions
-                    }
-                });
-            } catch (e) {
-                logThrottled('vs-cmd-fatal', `[VSCode API] \uD83D\uDD34 Fatal polling error: ${(e && e.message) ? e.message : String(e)}`);
-            } finally {
-                isAccepting = false;
+        try {
+            const now = Date.now();
+            if (now < globalCooldownUntil) {
+                // In cooldown, skip checking APIs but reschedule
+                updateBypassStatusBar();
+                pollIntervalId = setTimeout(runVsCodePolling, 500);
+                return;
             }
+            updateBypassStatusBar();
+
+            if (!isAccepting && !isStandby) {
+                isAccepting = true;
+                try {
+                    const results = await Promise.allSettled(
+                        ACCEPT_COMMANDS.map(cmd => vscode.commands.executeCommand(cmd))
+                    );
+
+                    results.forEach((res, idx) => {
+                        if (res.status === 'rejected') {
+                            const errMsg = (res.reason && res.reason.message) ? res.reason.message : String(res.reason);
+                            if (!errMsg.toLowerCase().includes('not found') && !errMsg.toLowerCase().includes('not enabled')) {
+                                logThrottled(`vs-cmd-${idx}`, `[VSCode API] \u26A0\uFE0F Cmd ${ACCEPT_COMMANDS[idx]} rejected: ${errMsg}`);
+                            }
+                        }
+                    });
+                } catch (e) {
+                    logThrottled('vs-cmd-fatal', `[VSCode API] \uD83D\uDD34 Fatal polling error: ${(e && e.message) ? e.message : String(e)}`);
+                } finally {
+                    isAccepting = false;
+                }
+            }
+        } catch (e) {
+            logThrottled('vs-poll-crash', `[VSCode API] \uD83D\uDD34 Polling cycle crashed (recovered): ${(e && e.message) ? e.message : String(e)}`);
         }
-        
-        // Schedule next run with ±30% jitter
-        const nextDelay = getRandomJitter(baseInterval, 0.3);
-        pollIntervalId = setTimeout(runVsCodePolling, nextDelay);
+
+        // ALWAYS reschedule — even after crash — to keep the loop alive
+        if (isPollingActive && isEnabled) {
+            const nextDelay = getRandomJitter(baseInterval, 0.3);
+            pollIntervalId = setTimeout(runVsCodePolling, nextDelay);
+        }
     }
 
     // CDP permission polling mapping - recursive setTimeout
+    // FIX v1.7.7: Entire body wrapped in try/catch — same resilience pattern as VS Code polling.
     async function runCdpPolling() {
         if (!isPollingActive || !isEnabled) return;
-        
-        const now = Date.now();
-        if (now >= globalCooldownUntil) {
-            await checkPermissionButtons();
+        try {
+            const now = Date.now();
+            if (now >= globalCooldownUntil) {
+                await checkPermissionButtons();
+            }
+            updateBypassStatusBar();
+        } catch (e) {
+            logThrottled('cdp-poll-crash', `[CDP] \uD83D\uDD34 Polling cycle crashed (recovered): ${(e && e.message) ? e.message : String(e)}`);
         }
-        updateBypassStatusBar();
-        
-        // Slower cadence for CDP, e.g., base 1500ms with ±20% jitter
-        const nextDelay = getRandomJitter(1500, 0.2);
-        cdpIntervalId = setTimeout(runCdpPolling, nextDelay);
+
+        // ALWAYS reschedule — even after crash — to keep the loop alive
+        if (isPollingActive && isEnabled) {
+            const nextDelay = getRandomJitter(1500, 0.2);
+            cdpIntervalId = setTimeout(runCdpPolling, nextDelay);
+        }
     }
 
     // Kick off the loops
@@ -968,7 +877,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.7.6 "The Resilient")');
+    log('Extension activating (v1.7.7 "The Unkillable")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -1097,21 +1006,38 @@ function activate(context) {
         })
     );
 
-    // Check CDP on activation — prompt auto-fix if port 9222 is closed
-    checkAndFixCDP().then(cdpOk => {
-        if (cdpOk) {
-            // Restore saved state
-            if (context.globalState.get('autorunproEnabled', false)) {
-                isEnabled = true;
-                startPolling();
+    // FIX v1.7.7: Retry CDP check at startup with backoff.
+    // The IDE's debug port may not be ready yet when the extension activates
+    // (especially after reload or slow startup). Without retry, the extension
+    // silently stays dead until manual toggle — the #1 reported "doesn't work" scenario.
+    const CDP_MAX_RETRIES = 5;
+    const CDP_RETRY_BASE_MS = 3000;
+    let cdpRetryCount = 0;
+
+    function cdpStartupCheck() {
+        checkAndFixCDP().then(cdpOk => {
+            if (cdpOk) {
+                // Restore saved state
+                if (context.globalState.get('autorunproEnabled', false)) {
+                    isEnabled = true;
+                    startPolling();
+                }
+                updateStatusBar();
+                updateBypassStatusBar();
+                log('Extension activated (CDP ready)');
+            } else if (cdpRetryCount < CDP_MAX_RETRIES) {
+                cdpRetryCount++;
+                const delay = CDP_RETRY_BASE_MS * cdpRetryCount;
+                log(`[CDP] Not ready — retry ${cdpRetryCount}/${CDP_MAX_RETRIES} in ${delay}ms`);
+                setTimeout(cdpStartupCheck, delay);
+            } else {
+                log('[CDP] Not available after retries — manual toggle or restart required');
+                updateStatusBar();
+                updateBypassStatusBar();
             }
-        } else {
-            log('CDP not available — bot will not start until debug port is enabled');
-        }
-        updateStatusBar();
-        updateBypassStatusBar();
-        log('Extension activated');
-    });
+        });
+    }
+    cdpStartupCheck();
 }
 
 function deactivate() {

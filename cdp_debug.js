@@ -132,8 +132,14 @@ function evaluate(wsUrl) {
         outputLines.push(`\n═══ Port ${port}: ${pages.length} targets ═══`);
 
         const candidates = pages.filter(isAgentCandidate);
-        const skipped = pages.length - candidates.length;
-        if (skipped > 0) outputLines.push(`  (skipped ${skipped} non-agent targets)`);
+        const skipped = pages.filter(p => !isAgentCandidate(p));
+        
+        if (skipped.length > 0) {
+            outputLines.push(`  (skipped ${skipped.length} non-agent targets):`);
+            for (const p of skipped) {
+                outputLines.push(`    - "${p.title}" [${p.url}]`);
+            }
+        }
 
         for (const page of candidates) {
             outputLines.push(`\n  ── ${page.title || page.url} ──`);

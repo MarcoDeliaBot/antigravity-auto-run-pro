@@ -1,3 +1,13 @@
+## [1.7.7] - 2026-03-25
+
+### Fixed
+- **Critical: Immortal Polling Loops** (`runVsCodePolling`, `runCdpPolling`): Entrambi i loop di polling ricorsivi ora sono wrappati in try/catch esterno. Precedentemente, qualsiasi eccezione non gestita (es. errore nella lettura della config, crash inatteso in `checkPermissionButtons`) uccideva silenziosamente la catena `setTimeout` — il polling si fermava per sempre ma la status bar mostrava ancora "Auto: ON". **Questa era la causa principale del "smette di funzionare senza motivo".**
+- **CDP Startup Retry** (`cdpStartupCheck`): L'estensione ora ritenta la connessione CDP fino a 5 volte con backoff crescente (3s, 6s, 9s, 12s, 15s) all'avvio. Precedentemente, se la porta debug non era pronta al momento dell'attivazione (IDE in caricamento, reload lento), l'estensione restava morta fino a toggle manuale.
+- **WebSocket CONNECTING→CLOSED Race** (`cdpEvaluate`): Aggiunta gestione esplicita per WebSocket che falliscono durante la fase CONNECTING senza mai raggiungere OPEN. L'handler `once('error')`/`once('close')` sulla Promise path risolve immediatamente con `null` e pulisce il pool, invece di aspettare il timeout di 1500ms.
+
+### Removed
+- **Dead Code Cleanup**: Rimosse le funzioni `cdpSendMulti()` e `clickBannerViaDom()` (~120 righe) che non erano chiamate da nessuna parte nel codice attivo. Queste funzioni creavano WebSocket non pooled che potevano confliggere con il pool principale (CDP permette una sola connessione per target).
+
 ## [1.7.6] - 2026-03-23
 
 ### Fixed
