@@ -1,3 +1,11 @@
+## [1.7.8] - 2026-03-25
+
+### Fixed
+- **Critical: Chrome Port Conflict** — Root cause del problema intermittente "smette di funzionare". Chrome (o altri browser) poteva occupare la porta 9222, impedendo all'IDE Antigravity di bindare la propria porta di debug. L'estensione trovava i target Chrome invece dei webview dell'agente, risultando in "CDP Status: Disconnected" e zero click.
+- **Dedicated Port 9333**: L'estensione ora usa la porta 9333 come porta primaria, dedicata esclusivamente ad Antigravity. La porta 9222 resta come fallback ma con conflict detection.
+- **Port Conflict Detection**: `checkAndFixCDP()` ora verifica se la porta 9222 è occupata da Chrome (analizzando gli URL dei target: `vscode-webview://` = Antigravity, `http://` = Chrome) e mostra un warning specifico con opzione auto-fix.
+- **Shortcut Migration**: Il patcher Windows ora migra automaticamente i shortcut dalla vecchia porta 9222 alla nuova 9333, senza creare duplicati del flag.
+
 ## [1.7.7] - 2026-03-25
 
 ### Fixed

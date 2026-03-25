@@ -1,7 +1,7 @@
-// AntiGravity AutoAccept v1.7.7 "The Unkillable"
+// AntiGravity AutoAccept v1.7.8 "The Port Guardian"
 // Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
 // Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode
-// Fixes v1.7.7: Immortal polling loops, CDP startup retry, WebSocket race guard, dead code removal
+// Fixes v1.7.8: Dedicated port 9333 (Chrome conflict fix), port conflict detection, shortcut migration
 
 const vscode = require('vscode');
 const http = require('http');
@@ -381,7 +381,7 @@ function updateStatusBar() {
     
     // Industrial Dashboard Tooltip
     const dashboard = [
-        `Antigravity Auto Run Pro v1.7.7`,
+        `Antigravity Auto Run Pro v1.7.8`,
         `───────────────────────────`,
         `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
         `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
@@ -527,8 +527,11 @@ function cdpEvaluate(wsUrl, expression) {
     });
 }
 
-// Wider port scan: 9000-9014 + common Chromium/Node defaults
-const CDP_PORTS = [9222, 9229, ...Array.from({ length: 15 }, (_, i) => 9000 + i)];
+// FIX v1.7.8: Dedicated port 9333 first — avoids conflict with Chrome (which often grabs 9222).
+// When Chrome steals 9222, Antigravity's --remote-debugging-port=9222 silently fails to bind,
+// leaving the IDE without ANY debug port. This was the root cause of the intermittent "stops working".
+const ANTIGRAVITY_PORT = 9333;
+const CDP_PORTS = [ANTIGRAVITY_PORT, 9222, 9229, ...Array.from({ length: 15 }, (_, i) => 9000 + i)];
 
 let isCheckingCDP = false;
 let lastClickedButton = null;
@@ -752,36 +755,75 @@ function stopPolling() {
 // ─── CDP Auto-Fix: Detect & Repair ───────────────────────────────────
 const cp = require('child_process');
 
+// FIX v1.7.8: Check ANTIGRAVITY_PORT first, then fallback to 9222.
+// Detects port conflict (Chrome stealing the port) and warns the user.
 function checkAndFixCDP() {
     return new Promise((resolve) => {
-        const req = http.get({ hostname: '127.0.0.1', port: 9222, path: '/json/list', timeout: 2000 }, (res) => {
-            let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => {
-                log('[CDP] Debug port active ✓');
+        // Try the dedicated Antigravity port first
+        tryPort(ANTIGRAVITY_PORT, (ok) => {
+            if (ok) {
+                log(`[CDP] Debug port active on ${ANTIGRAVITY_PORT} ✓`);
                 resolve(true);
+                return;
+            }
+            // Fallback: try legacy port 9222
+            tryPort(9222, (ok2, pages) => {
+                if (ok2) {
+                    // Port 9222 is open — but is it Antigravity or Chrome?
+                    const hasAntigravityTarget = pages && pages.some(p => {
+                        const url = (p.url || '').toLowerCase();
+                        return url.startsWith('vscode-webview://') || url.includes('vscode-file://');
+                    });
+                    if (hasAntigravityTarget) {
+                        log('[CDP] Debug port active on 9222 (Antigravity) ✓');
+                        resolve(true);
+                    } else {
+                        // Port 9222 is open but belongs to Chrome/another browser
+                        log('[CDP] ⚠ Port 9222 is occupied by another app (Chrome?). Antigravity needs its own port.');
+                        vscode.window.showWarningMessage(
+                            '⚡ Port 9222 is used by Chrome — Antigravity needs port ' + ANTIGRAVITY_PORT + '.',
+                            'Auto-Fix Shortcut (Windows)',
+                            'Manual Guide'
+                        ).then(action => {
+                            if (action === 'Auto-Fix Shortcut (Windows)') {
+                                applyPermanentWindowsPatch();
+                            } else if (action === 'Manual Guide') {
+                                vscode.env.openExternal(vscode.Uri.parse('https://github.com/yazanbaker94/AntiGravity-AutoAccept#setup'));
+                            }
+                        });
+                        resolve(false);
+                    }
+                } else {
+                    log('[CDP] ⚠ No debug port found — remote debugging not enabled');
+                    vscode.window.showErrorMessage(
+                        '⚡ AutoAccept needs Debug Mode. No debug port found on ' + ANTIGRAVITY_PORT + ' or 9222.',
+                        'Auto-Fix Shortcut (Windows)',
+                        'Manual Guide'
+                    ).then(action => {
+                        if (action === 'Auto-Fix Shortcut (Windows)') {
+                            applyPermanentWindowsPatch();
+                        } else if (action === 'Manual Guide') {
+                            vscode.env.openExternal(vscode.Uri.parse('https://github.com/yazanbaker94/AntiGravity-AutoAccept#setup'));
+                        }
+                    });
+                    resolve(false);
+                }
             });
         });
-        req.on('error', (err) => {
-            if (err.code === 'ECONNREFUSED') {
-                log('[CDP] ⚠ Port 9222 refused — remote debugging not enabled');
-                // Fire the notification (non-blocking) — handle clicks via .then()
-                vscode.window.showErrorMessage(
-                    '⚡ AutoAccept needs Debug Mode to click buttons. Port 9222 is not open.',
-                    'Auto-Fix Shortcut (Windows)',
-                    'Manual Guide'
-                ).then(action => {
-                    if (action === 'Auto-Fix Shortcut (Windows)') {
-                        applyPermanentWindowsPatch();
-                    } else if (action === 'Manual Guide') {
-                        vscode.env.openExternal(vscode.Uri.parse('https://github.com/yazanbaker94/AntiGravity-AutoAccept#setup'));
-                    }
-                });
-            }
-            resolve(false);
-        });
-        req.on('timeout', () => { req.destroy(); resolve(false); });
     });
+}
+
+function tryPort(port, callback) {
+    const req = http.get({ hostname: '127.0.0.1', port, path: '/json/list', timeout: 2000 }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+            try { callback(true, JSON.parse(data)); }
+            catch (e) { callback(true, []); }
+        });
+    });
+    req.on('error', () => callback(false, null));
+    req.on('timeout', () => { req.destroy(); callback(false, null); });
 }
 
 function applyPermanentWindowsPatch() {
@@ -794,10 +836,12 @@ function applyPermanentWindowsPatch() {
     const fs = require('fs');
     const path = require('path');
 
-    // Write a .ps1 file to avoid inline escaping issues with --remote-debugging-port
+    // FIX v1.7.8: Use dedicated port 9333 to avoid Chrome conflict.
+    // Also migrates shortcuts still using the old port 9222.
     const psFile = path.join(os.tmpdir(), 'antigravity_patch_shortcut.ps1');
     const psContent = `
-$flag = "--remote-debugging-port=9222"
+$newFlag = "--remote-debugging-port=${ANTIGRAVITY_PORT}"
+$oldPattern = "--remote-debugging-port=*"
 $WshShell = New-Object -comObject WScript.Shell
 $paths = @(
     "$env:USERPROFILE\\Desktop",
@@ -812,8 +856,17 @@ foreach ($dir in $paths) {
         foreach ($file in $files) {
             $shortcut = $WshShell.CreateShortcut($file.FullName)
             if ($shortcut.TargetPath -like "*Antigravity*") {
-                if ($shortcut.Arguments -notlike "*remote-debugging-port*") {
-                    $shortcut.Arguments = ($shortcut.Arguments + " " + $flag).Trim()
+                $args = $shortcut.Arguments
+                if ($args -like "*remote-debugging-port=*") {
+                    # Migrate: replace old port with new dedicated port
+                    $args = $args -replace '--remote-debugging-port=\\d+', $newFlag
+                    $shortcut.Arguments = $args
+                    $shortcut.Save()
+                    $patched = $true
+                    Write-Output "MIGRATED: $($file.FullName)"
+                } else {
+                    # New: add the flag
+                    $shortcut.Arguments = ($args + " " + $newFlag).Trim()
                     $shortcut.Save()
                     $patched = $true
                     Write-Output "PATCHED: $($file.FullName)"
@@ -877,7 +930,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.7.7 "The Unkillable")');
+    log('Extension activating (v1.7.8 "The Port Guardian")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
