@@ -1,7 +1,7 @@
-// AntiGravity AutoAccept v1.7.8 "The Port Guardian"
+// AntiGravity AutoAccept v1.7.9 "The Expand Hunter"
 // Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
 // Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode
-// Fixes v1.7.8: Dedicated port 9333 (Chrome conflict fix), port conflict detection, shortcut migration
+// Fixes v1.7.9: Smart Expand targeting (requires-input priority), robust click dispatch, isGenerating visibility guard
 
 const vscode = require('vscode');
 const http = require('http');
@@ -190,24 +190,83 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
         return null;
     }
     // ═══ GENERATION CHECK ═══
+    // FIX v1.7.9: Added visibility guard — only count VISIBLE, ENABLED stop buttons.
+    // The Antigravity IDE keeps a Stop ■ button in the input area at all times.
+    // Without the visibility check, isGenerating() returned true during "Waiting.."
+    // state, blocking ALL button detection (including Expand).
+    function isElementVisible(el) {
+        if (!el) return false;
+        if (el.offsetParent === null && getComputedStyle(el).position !== 'fixed') return false;
+        var style = getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity) < 0.1) return false;
+        if (el.disabled) return false;
+        var rect = el.getBoundingClientRect();
+        if (rect.width === 0 && rect.height === 0) return false;
+        return true;
+    }
+
     function isGenerating() {
         var walkers = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
         var n;
+        // FIX v1.7.9: Also check for active streaming indicators (animated dots, spinners)
+        var hasStreamingIndicator = false;
         while ((n = walkers.nextNode())) {
             var text = (n.textContent || '').trim().toLowerCase();
             if (n.tagName === 'BUTTON' && (text === 'interrupt' || text === 'stop generating' || text === 'cancel' || text === 'interrompi')) {
-                return true;
+                // FIX v1.7.9: Only count if the button is actually visible and enabled
+                if (isElementVisible(n)) return true;
             }
             if (n.getAttribute('data-testid') === 'interrupt-button' || n.getAttribute('aria-label') === 'Interrupt') {
-                return true;
+                if (isElementVisible(n)) return true;
             }
-            // Check for typical loaders or generating indicators if needed
+            // Check for streaming/typing indicators (more reliable than stop button presence)
+            if (n.classList && (n.classList.contains('streaming') || n.classList.contains('typing-indicator') ||
+                n.classList.contains('generating'))) {
+                hasStreamingIndicator = true;
+            }
         }
-        return false;
+        return hasStreamingIndicator;
     }
 
     if (isGenerating()) {
         return 'generating';
+    }
+
+    // ═══ SMART EXPAND: "Requires Input" Priority ═══
+    // FIX v1.7.9: When "X Steps Requires Input — Expand" is present,
+    // click THAT specific Expand, not the generic "Expand all" for Progress Updates.
+    // The TreeWalker finds elements in DOM order — "Expand all" often comes BEFORE
+    // the step-specific "Expand", causing the extension to toggle Progress Updates
+    // instead of revealing the Run/Accept buttons.
+    function findRequiresInputExpand() {
+        var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+        var node;
+        while ((node = walker.nextNode())) {
+            var fullText = (node.textContent || '').replace(/\\s+/g, ' ').trim().toLowerCase();
+            // Match "1 step requires input  expand" or localized variants
+            if ((fullText.includes('requires input') || fullText.includes('richiede input')) &&
+                (fullText.includes('expand') || fullText.includes('espandi'))) {
+                // Check if this is a reasonably-sized container (not document.body)
+                var textLen = fullText.length;
+                if (textLen > 5 && textLen < 200) {
+                    // Found the "Requires Input — Expand" row.
+                    // Now find the Expand button within this element.
+                    var innerWalker = document.createTreeWalker(node, NodeFilter.SHOW_ELEMENT);
+                    var inner;
+                    while ((inner = innerWalker.nextNode())) {
+                        var innerDirect = getDirectText(inner).toLowerCase();
+                        var innerFull = (inner.textContent || '').trim().toLowerCase();
+                        if (innerDirect.startsWith('expand') || innerDirect.startsWith('espandi') ||
+                            innerFull === 'expand' || innerFull === 'espandi') {
+                            return closestClickable(inner);
+                        }
+                    }
+                    // If no inner Expand found, the container itself is clickable
+                    return closestClickable(node);
+                }
+            }
+        }
+        return null;
     }
 
     // ═══ DETERMINISTIC FINGERPRINTING (Hash) ═══
@@ -243,13 +302,56 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
     var fingerprint = outputData ? getHashCode(outputData.text) : 'no-output';
     var selectorUsed = outputData ? outputData.selector : 'none';
     
+    // ═══ ROBUST CLICK DISPATCH ═══
+    // FIX v1.7.9: Dispatch full pointer/mouse event sequence instead of just .click().
+    // React/Preact components in Antigravity IDE may listen to mousedown/pointerdown
+    // instead of the click event. A bare .click() misses those handlers.
+    function robustClick(el) {
+        // Zero Focus Theft: Prevent blur/focus shift during click
+        var preventer = function(e) { e.stopPropagation(); };
+        el.addEventListener('blur', preventer, true);
+
+        try {
+            var rect = el.getBoundingClientRect();
+            var cx = rect.left + rect.width / 2;
+            var cy = rect.top + rect.height / 2;
+            var opts = { bubbles: true, cancelable: true, clientX: cx, clientY: cy, button: 0 };
+
+            el.dispatchEvent(new PointerEvent('pointerdown', opts));
+            el.dispatchEvent(new MouseEvent('mousedown', opts));
+            el.dispatchEvent(new PointerEvent('pointerup', opts));
+            el.dispatchEvent(new MouseEvent('mouseup', opts));
+            el.dispatchEvent(new MouseEvent('click', opts));
+        } catch(e) {
+            // Fallback: bare click if PointerEvent not supported
+            el.click();
+        }
+
+        setTimeout(function() { el.removeEventListener('blur', preventer, true); }, 500);
+    }
+
+    // ═══ PRIORITY PHASE: "Requires Input → Expand" ═══
+    // FIX v1.7.9: Before the generic BUTTON_TEXTS loop, check for the specific
+    // "X Steps Requires Input — Expand" pattern. This prevents clicking the wrong
+    // "Expand all" (Progress Updates) instead of the step-specific "Expand".
+    var requiresInputBtn = findRequiresInputExpand();
+    if (requiresInputBtn) {
+        if (AUDIT_MODE) {
+            return 'audit-match:requires-input-expand|' + fingerprint;
+        }
+        robustClick(requiresInputBtn);
+        requiresInputBtn.setAttribute('data-ag-clicked', fingerprint);
+        requiresInputBtn.setAttribute('data-ag-session', SESSION_ID);
+        return 'clicked:requires-input-expand|' + fingerprint + '|' + selectorUsed;
+    }
+
     for (var t = 0; t < BUTTON_TEXTS.length; t++) {
         var btn = findButton(document.body, BUTTON_TEXTS[t]);
         if (btn) {
             if (STANDBY_BUTTON === BUTTON_TEXTS[t]) {
                 return 'standby-present:' + BUTTON_TEXTS[t] + '|' + fingerprint + '|' + selectorUsed;
             }
-            
+
             // Industrial Tagging Check
             // FIX v1.7.4: Exempt re-clickable buttons (expand, collapse, requires input,
             // changes overview) from the tagging guard. These are idempotent UI toggles
@@ -271,15 +373,10 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
                 return 'audit-match:' + BUTTON_TEXTS[t] + '|' + fingerprint;
             }
 
-            // Zero Focus Theft: Prevent blur/focus shift during click
-            var preventer = function(e) { e.stopPropagation(); };
-            btn.addEventListener('blur', preventer, true);
-            
-            btn.click();
+            // FIX v1.7.9: Use robust click dispatch for all buttons
+            robustClick(btn);
             btn.setAttribute('data-ag-clicked', fingerprint);
             btn.setAttribute('data-ag-session', SESSION_ID);
-            
-            setTimeout(function() { btn.removeEventListener('blur', preventer, true); }, 500);
 
             return 'clicked:' + BUTTON_TEXTS[t] + '|' + fingerprint + '|' + selectorUsed;
         }
@@ -381,7 +478,7 @@ function updateStatusBar() {
     
     // Industrial Dashboard Tooltip
     const dashboard = [
-        `Antigravity Auto Run Pro v1.7.8`,
+        `Antigravity Auto Run Pro v1.7.9`,
         `───────────────────────────`,
         `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
         `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
@@ -599,11 +696,13 @@ async function checkPermissionButtons() {
                                 lastClickedTime = now;
 
                                 // FIX v1.7.3: include all expand/collapse variants in high-tolerance set
+                                // FIX v1.7.9: added 'requires-input-expand' to high-tolerance set
                                 const isHighToleranceBtn = (
                                     btnText === 'expand' || btnText === 'espandi' ||
                                     btnText === 'expand all' || btnText === 'espandi tutto' ||
                                     btnText === 'collapse all' || btnText === 'comprimi tutto' ||
                                     btnText === 'always run' || btnText === 'esegui sempre' ||
+                                    btnText === 'requires-input-expand' ||
                                     btnText.includes('allow') || btnText.includes('consenti')
                                 );
                                 const loopThreshold = isHighToleranceBtn ? 30 : 15;
@@ -930,7 +1029,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.7.8 "The Port Guardian")');
+    log('Extension activating (v1.7.9 "The Expand Hunter")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);

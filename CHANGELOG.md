@@ -1,3 +1,10 @@
+## [1.7.9] - 2026-03-26
+
+### Fixed
+- **Critical: Smart Expand Targeting** — Root cause del "si blocca su Expand". Quando l'UI mostra sia "Progress Updates — Expand all" che "1 Step Requires Input — Expand", il TreeWalker trovava il primo `Expand all` nel DOM (per le Progress Updates) e cliccava quello invece dell'`Expand` specifico per lo step che richiede input. Aggiunta fase prioritaria `findRequiresInputExpand()` che localizza l'elemento "requires input" e clicca SOLO l'Expand dentro quella sezione.
+- **Critical: isGenerating() False Positive** — Il pulsante Stop ■ nella barra input dell'IDE Antigravity è sempre presente nel DOM (anche durante lo stato "Waiting.."). `isGenerating()` lo rilevava e ritornava `true`, bloccando TUTTO il rilevamento pulsanti. Aggiunto check di visibilità (`offsetParent`, `display`, `visibility`, `opacity`, `disabled`, `getBoundingClientRect`) — solo pulsanti stop visibili e attivi triggerano il guard.
+- **Robust Click Dispatch** — Sostituito il semplice `btn.click()` con sequenza completa `pointerdown → mousedown → pointerup → mouseup → click` con coordinate reali (`getBoundingClientRect`). I componenti React/Preact nell'IDE Antigravity possono intercettare `mousedown`/`pointerdown` invece di `click`, causando click silenziosamente ignorati.
+
 ## [1.7.8] - 2026-03-25
 
 ### Fixed
