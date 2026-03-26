@@ -42,8 +42,11 @@ const SAFE_TEXTS = [
 
 // Unsafe texts: only auto-accepted in God Mode (parent folder access)
 // ⚠️ These grant the agent access to files outside the workspace
+// FIX v1.7.9: Added 'always' standalone — the Antigravity IDE truncates
+// "Always allow" to "Always ..." via CSS text-overflow. The ellipsis gets
+// stripped by normalizeText, leaving just "always" which must match.
 const UNSAFE_TEXTS = [
-    'always allow', 'allow this conversation', 'allow',
+    'always allow', 'allow this conversation', 'allow', 'always',
     'consenti sempre', 'consenti in questa conversazione', 'consenti',
 ];
 
@@ -115,6 +118,13 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
         var n = normalizeText(nodeText);
         var t = normalizeText(target);
         if (n === t) return true;
+        // FIX v1.7.9: Strip trailing ellipsis from truncated UI text.
+        // The Antigravity IDE truncates long button labels with CSS text-overflow,
+        // producing "Always ..." or "Always…" instead of "Always allow".
+        var nClean = n.replace(/[\.\u2026]+$/, '').trim();
+        if (nClean && nClean === t) return true;
+        // Also: if the cleaned text is a prefix of the target (e.g. "always" matches "always allow")
+        if (nClean.length >= 4 && t.startsWith(nClean)) return true;
         // Allow "run alt+..." or "esegui alt+..." (keyboard shortcut suffix)
         if (n.startsWith(t + ' alt+')) return true;
         if (n.startsWith(t + ' ctrl+')) return true;
