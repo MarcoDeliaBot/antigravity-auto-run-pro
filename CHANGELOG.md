@@ -1,3 +1,13 @@
+## [1.8.0] - 2026-04-02
+
+### Fixed
+- **Porta errata nel messaggio manuale**: Il messaggio di warning mostrato quando nessun shortcut Antigravity è trovato indicava `--remote-debugging-port=9222` invece della porta dedicata corretta `9333` (introdotta in v1.7.8). L'utente veniva guidato a configurare la porta sbagliata.
+- **Link GitHub errato**: I pulsanti "Manual Guide" nei dialog di errore CDP puntavano al repository `yazanbaker94/AntiGravity-AutoAccept` (repo di terze parti). Corretti per puntare a `MarcoDeliaBot/antigravity-auto-run-pro#readme`.
+- **Audit Mode non persisteva**: Attivare/disattivare l'Audit Mode non veniva salvato in `globalState`, quindi si resettava ad ogni riavvio dell'estensione. Ora viene persistito come `isGodMode` e `isEnabled`.
+
+### Changed
+- **`.vscodeignore` ampliato**: Aggiunte wildcard per escludere tutti i file di debug e test (`cdp_*.js`, `cdp_*.json`, `debug_*.js`, `test_*.js`, `test_*.html`, `test_*.md`, `shadow_findings.json`) dal pacchetto `.vsix`. Il file `cdp_full_dom_dump.json` da 1.1 MB non viene più incluso nel pacchetto pubblicato.
+
 ## [1.7.9] - 2026-03-26
 
 ### Fixed

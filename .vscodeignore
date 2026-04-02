@@ -8,8 +8,15 @@ src/**
 *.vsix
 _backup/**
 wiki/**
+# Debug/Test scripts — not shipped
+cdp_*.js
+cdp_*.json
 cdp_*.txt
+debug_*.js
+test_*.js
+test_*.html
+test_*.md
+shadow_findings.json
+build_output.txt
 *.txt
-cdp_debug.js
-cdp_inspect.js
 node_modules/@types/**

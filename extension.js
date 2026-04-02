@@ -1,7 +1,7 @@
-// AntiGravity AutoAccept v1.7.9 "The Expand Hunter"
+// AntiGravity AutoAccept v1.8.0 "The Cleanup"
 // Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
-// Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode
-// Fixes v1.7.9: Smart Expand targeting (requires-input priority), robust click dispatch, isGenerating visibility guard
+// Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode, Audit Persistence
+// Fixes v1.8.0: Porta corretta nel messaggio manuale (9333), link GitHub corretto, persistenza Audit Mode
 
 const vscode = require('vscode');
 const http = require('http');
@@ -488,7 +488,7 @@ function updateStatusBar() {
     
     // Industrial Dashboard Tooltip
     const dashboard = [
-        `Antigravity Auto Run Pro v1.7.9`,
+        `Antigravity Auto Run Pro v1.8.0`,
         `───────────────────────────`,
         `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
         `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
@@ -897,7 +897,7 @@ function checkAndFixCDP() {
                             if (action === 'Auto-Fix Shortcut (Windows)') {
                                 applyPermanentWindowsPatch();
                             } else if (action === 'Manual Guide') {
-                                vscode.env.openExternal(vscode.Uri.parse('https://github.com/yazanbaker94/AntiGravity-AutoAccept#setup'));
+                                vscode.env.openExternal(vscode.Uri.parse('https://github.com/MarcoDeliaBot/antigravity-auto-run-pro#readme'));
                             }
                         });
                         resolve(false);
@@ -912,7 +912,7 @@ function checkAndFixCDP() {
                         if (action === 'Auto-Fix Shortcut (Windows)') {
                             applyPermanentWindowsPatch();
                         } else if (action === 'Manual Guide') {
-                            vscode.env.openExternal(vscode.Uri.parse('https://github.com/yazanbaker94/AntiGravity-AutoAccept#setup'));
+                            vscode.env.openExternal(vscode.Uri.parse('https://github.com/MarcoDeliaBot/antigravity-auto-run-pro#readme'));
                         }
                     });
                     resolve(false);
@@ -1018,7 +1018,7 @@ if ($patched) { Write-Output "SUCCESS" } else { Write-Output "NOT_FOUND" }
         } else {
             log('[CDP] No matching shortcuts found');
             vscode.window.showWarningMessage(
-                'No Antigravity shortcut found on Desktop or Start Menu. Add --remote-debugging-port=9222 to your shortcut manually.'
+                `No Antigravity shortcut found on Desktop or Start Menu. Add --remote-debugging-port=${ANTIGRAVITY_PORT} to your shortcut manually.`
             );
         }
     });
@@ -1039,7 +1039,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.7.9 "The Expand Hunter")');
+    log('Extension activating (v1.8.0 "The Cleanup")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -1061,6 +1061,8 @@ function activate(context) {
     // Restore God Mode state from settings and persisted state
     const config = vscode.workspace.getConfiguration('autorunpro');
     isGodMode = config.get('godMode', false) || context.globalState.get('autorunproGodMode', false);
+    // FIX v1.8.0: restore Audit Mode state across restarts
+    isAuditMode = context.globalState.get('autorunproAuditMode', false);
     updateGodModeStatusBar();
 
     context.subscriptions.push(
@@ -1116,6 +1118,8 @@ function activate(context) {
         vscode.commands.registerCommand('autorunpro.toggleAudit', () => {
             isAuditMode = !isAuditMode;
             log(`Audit Mode: ${isAuditMode ? 'ON 🔍' : 'OFF'}`);
+            // FIX v1.8.0: persist Audit Mode across restarts
+            context.globalState.update('autorunproAuditMode', isAuditMode);
             updateStatusBar();
             vscode.window.showInformationMessage(
                 `AntiGravity AutoAccept: Audit Mode ${isAuditMode ? 'ENABLED (Dry-run)' : 'DISABLED'}`
