@@ -1,4 +1,8 @@
-## [1.8.0] - 2026-04-02
+## [1.8.0] - 2026-04-03
+
+### Verified
+- **Full Test Suite**: Eseguito il test di verifica completo (7 step) come definito in `test_prompt.md`. Confermata l'automatizzazione dei click su pulsanti "Run", "Accept" ed "Expand" in ambiente Windows 11 con PowerShell 5.1.
+
 
 ### Fixed
 - **Porta errata nel messaggio manuale**: Il messaggio di warning mostrato quando nessun shortcut Antigravity è trovato indicava `--remote-debugging-port=9222` invece della porta dedicata corretta `9333` (introdotta in v1.7.8). L'utente veniva guidato a configurare la porta sbagliata.
