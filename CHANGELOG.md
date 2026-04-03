@@ -1,4 +1,11 @@
+## [1.8.1] - 2026-04-03
+
+### Fixed
+- **Popup errore CDP ripetuto all'avvio**: Il messaggio "AutoAccept needs Debug Mode. No debug port found on 9333 or 9222" veniva mostrato ad ogni retry (fino a 5 volte in 45 secondi). Ora il popup appare **solo una volta** — i retry successivi vengono registrati solo nel log.
+- **Check CDP invasivo con estensione disabilitata**: l'estensione eseguiva il check della porta di debug all'avvio anche se l'utente aveva lasciato l'auto-run su OFF. Ora il check viene saltato all'avvio se l'estensione era disabilitata nell'ultima sessione, ed eseguito in modo lazy al primo toggle-ON.
+
 ## [1.8.0] - 2026-04-03
+
 
 ### Verified
 - **Full Test Suite**: Eseguito il test di verifica completo (7 step) come definito in `test_prompt.md`. Confermata l'automatizzazione dei click su pulsanti "Run", "Accept" ed "Expand" in ambiente Windows 11 con PowerShell 5.1.

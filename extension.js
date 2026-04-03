@@ -1,7 +1,7 @@
-// AntiGravity AutoAccept v1.8.0 "The Cleanup"
+// AntiGravity AutoAccept v1.8.1 "The Silent Fix"
 // Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
 // Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode, Audit Persistence
-// Fixes v1.8.0: Porta corretta nel messaggio manuale (9333), link GitHub corretto, persistenza Audit Mode
+// Fixes v1.8.1: Popup errore CDP mostrato solo una volta; check CDP deferred se ext era OFF
 
 const vscode = require('vscode');
 const http = require('http');
@@ -488,7 +488,7 @@ function updateStatusBar() {
     
     // Industrial Dashboard Tooltip
     const dashboard = [
-        `Antigravity Auto Run Pro v1.8.0`,
+        `Antigravity Auto Run Pro v1.8.1`,
         `───────────────────────────`,
         `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
         `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
@@ -904,17 +904,21 @@ function checkAndFixCDP() {
                     }
                 } else {
                     log('[CDP] ⚠ No debug port found — remote debugging not enabled');
-                    vscode.window.showErrorMessage(
-                        '⚡ AutoAccept needs Debug Mode. No debug port found on ' + ANTIGRAVITY_PORT + ' or 9222.',
-                        'Auto-Fix Shortcut (Windows)',
-                        'Manual Guide'
-                    ).then(action => {
-                        if (action === 'Auto-Fix Shortcut (Windows)') {
-                            applyPermanentWindowsPatch();
-                        } else if (action === 'Manual Guide') {
-                            vscode.env.openExternal(vscode.Uri.parse('https://github.com/MarcoDeliaBot/antigravity-auto-run-pro#readme'));
-                        }
-                    });
+                    // FIX v1.8.1: show popup only on first call, subsequent retries only log
+                    if (!checkAndFixCDP._notifiedOnce) {
+                        checkAndFixCDP._notifiedOnce = true;
+                        vscode.window.showErrorMessage(
+                            '⚡ AutoAccept needs Debug Mode. No debug port found on ' + ANTIGRAVITY_PORT + ' or 9222.',
+                            'Auto-Fix Shortcut (Windows)',
+                            'Manual Guide'
+                        ).then(action => {
+                            if (action === 'Auto-Fix Shortcut (Windows)') {
+                                applyPermanentWindowsPatch();
+                            } else if (action === 'Manual Guide') {
+                                vscode.env.openExternal(vscode.Uri.parse('https://github.com/MarcoDeliaBot/antigravity-auto-run-pro#readme'));
+                            }
+                        });
+                    }
                     resolve(false);
                 }
             });
@@ -1039,7 +1043,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.8.0 "The Cleanup")');
+    log('Extension activating (v1.8.1 "The Silent Fix")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -1073,6 +1077,12 @@ function activate(context) {
                 isStandby = false;
                 standbyButton = null;
                 consecutiveClickCount = 0;
+                // FIX v1.8.1: Run CDP check lazily on first toggle-ON (covers the case where
+                // extension was OFF at startup and cdpStartupCheck was skipped).
+                if (!checkAndFixCDP._notifiedOnce) {
+                    cdpRetryCount = 0;
+                    cdpStartupCheck();
+                }
                 startPolling();
             } else {
                 stopPolling();
@@ -1176,9 +1186,14 @@ function activate(context) {
     // The IDE's debug port may not be ready yet when the extension activates
     // (especially after reload or slow startup). Without retry, the extension
     // silently stays dead until manual toggle — the #1 reported "doesn't work" scenario.
+    // FIX v1.8.1: Skip CDP startup check entirely if the extension was disabled in the
+    // last session — no point showing a "no debug port" error to a user who hasn't
+    // enabled the extension yet. The check runs lazily on first toggle-ON instead.
     const CDP_MAX_RETRIES = 5;
     const CDP_RETRY_BASE_MS = 3000;
     let cdpRetryCount = 0;
+    // Reset notification flag for this session
+    checkAndFixCDP._notifiedOnce = false;
 
     function cdpStartupCheck() {
         checkAndFixCDP().then(cdpOk => {
@@ -1203,7 +1218,18 @@ function activate(context) {
             }
         });
     }
-    cdpStartupCheck();
+
+    // FIX v1.8.1: Only run the startup CDP check if the extension was previously enabled.
+    // If it was OFF, we skip the check (and the annoying error popup) entirely.
+    // The check will happen automatically the first time the user toggles it ON.
+    const wasEnabled = context.globalState.get('autorunproEnabled', false);
+    if (wasEnabled) {
+        cdpStartupCheck();
+    } else {
+        log('Extension activated (CDP check deferred — extension was OFF)');
+        updateStatusBar();
+        updateBypassStatusBar();
+    }
 }
 
 function deactivate() {
