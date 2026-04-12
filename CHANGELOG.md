@@ -1,111 +1,118 @@
+# Changelog
+
+All notable changes to the **Antigravity Auto Run Pro** extension will be documented in this file.
+
+## [1.8.2] - 2026-04-12
+
+### Changed
+- **Changelog Translation**: Translated all previous Italian changelog entries into English to maintain standard open-source conventions and comply with language requirements for code documentation.
+
 ## [1.8.1] - 2026-04-03
 
 ### Verified
-- **Full Test Suite**: Eseguito il test di verifica completo (7 step) come definito in `test_prompt.md`. Confermata l'automatizzazione dei click su pulsanti "Run", "Accept" ed "Expand" in ambiente Windows 11 con PowerShell 5.1.
+- **Full Test Suite**: Executed the complete verification test (7 steps) as defined in `test_prompt.md`. Confirmed the automation of clicks on "Run", "Accept", and "Expand" buttons on Windows 11 with PowerShell 5.1.
 
 ### Fixed
-- **Popup errore CDP ripetuto all'avvio**: Il messaggio "AutoAccept needs Debug Mode. No debug port found on 9333 or 9222" veniva mostrato ad ogni retry (fino a 5 volte in 45 secondi). Ora il popup appare **solo una volta** — i retry successivi vengono registrati solo nel log.
-- **Check CDP invasivo con estensione disabilitata**: l'estensione eseguiva il check della porta di debug all'avvio anche se l'utente aveva lasciato l'auto-run su OFF. Ora il check viene saltato all'avvio se l'estensione era disabilitata nell'ultima sessione, ed eseguito in modo lazy al primo toggle-ON.
+- **Repeated CDP error popup on startup**: The message "AutoAccept needs Debug Mode. No debug port found on 9333 or 9222" was shown on every retry (up to 5 times in 45 seconds). Now the popup appears **only once** — subsequent retries are only recorded in the log.
+- **Invasive CDP check with extension disabled**: The extension performed the debug port check on startup even if the user left the auto-run OFF. Now the check is skipped on startup if the extension was disabled in the last session, and lazily executed on the first toggle-ON.
 
 ## [1.8.0] - 2026-04-03
 
-
-
 ### Fixed
-- **Porta errata nel messaggio manuale**: Il messaggio di warning mostrato quando nessun shortcut Antigravity è trovato indicava `--remote-debugging-port=9222` invece della porta dedicata corretta `9333` (introdotta in v1.7.8). L'utente veniva guidato a configurare la porta sbagliata.
-- **Link GitHub errato**: I pulsanti "Manual Guide" nei dialog di errore CDP puntavano al repository `yazanbaker94/AntiGravity-AutoAccept` (repo di terze parti). Corretti per puntare a `MarcoDeliaBot/antigravity-auto-run-pro#readme`.
-- **Audit Mode non persisteva**: Attivare/disattivare l'Audit Mode non veniva salvato in `globalState`, quindi si resettava ad ogni riavvio dell'estensione. Ora viene persistito come `isGodMode` e `isEnabled`.
+- **Wrong port in manual message**: The warning message shown when no Antigravity shortcut is found indicated `--remote-debugging-port=9222` instead of the correct dedicated port `9333` (introduced in v1.7.8). The user was guided to configure the wrong port.
+- **Wrong GitHub link**: The "Manual Guide" buttons in the CDP error dialogs pointed to the `yazanbaker94/AntiGravity-AutoAccept` repository (third-party repo). Corrected to point to `MarcoDeliaBot/antigravity-auto-run-pro#readme`.
+- **Audit Mode not persisting**: Toggling the Audit Mode was not saved in `globalState`, so it reset on every extension restart. Now it persists just like `isGodMode` and `isEnabled`.
 
 ### Changed
-- **`.vscodeignore` ampliato**: Aggiunte wildcard per escludere tutti i file di debug e test (`cdp_*.js`, `cdp_*.json`, `debug_*.js`, `test_*.js`, `test_*.html`, `test_*.md`, `shadow_findings.json`) dal pacchetto `.vsix`. Il file `cdp_full_dom_dump.json` da 1.1 MB non viene più incluso nel pacchetto pubblicato.
+- **Expanded `.vscodeignore`**: Added wildcards to exclude all debug and test files (`cdp_*.js`, `cdp_*.json`, `debug_*.js`, `test_*.js`, `test_*.html`, `test_*.md`, `shadow_findings.json`) from the published `.vsix` package. The 1.1 MB `cdp_full_dom_dump.json` file is no longer included.
 
 ## [1.7.9] - 2026-03-26
 
 ### Fixed
-- **Critical: Smart Expand Targeting** — Root cause del "si blocca su Expand". Quando l'UI mostra sia "Progress Updates — Expand all" che "1 Step Requires Input — Expand", il TreeWalker trovava il primo `Expand all` nel DOM (per le Progress Updates) e cliccava quello invece dell'`Expand` specifico per lo step che richiede input. Aggiunta fase prioritaria `findRequiresInputExpand()` che localizza l'elemento "requires input" e clicca SOLO l'Expand dentro quella sezione.
-- **Critical: isGenerating() False Positive** — Il pulsante Stop ■ nella barra input dell'IDE Antigravity è sempre presente nel DOM (anche durante lo stato "Waiting.."). `isGenerating()` lo rilevava e ritornava `true`, bloccando TUTTO il rilevamento pulsanti. Aggiunto check di visibilità (`offsetParent`, `display`, `visibility`, `opacity`, `disabled`, `getBoundingClientRect`) — solo pulsanti stop visibili e attivi triggerano il guard.
-- **Robust Click Dispatch** — Sostituito il semplice `btn.click()` con sequenza completa `pointerdown → mousedown → pointerup → mouseup → click` con coordinate reali (`getBoundingClientRect`). I componenti React/Preact nell'IDE Antigravity possono intercettare `mousedown`/`pointerdown` invece di `click`, causando click silenziosamente ignorati.
+- **Critical: Smart Expand Targeting** — Root cause of the "stuck on Expand" issue. When the UI shows both "Progress Updates — Expand all" and "1 Step Requires Input — Expand", the TreeWalker found the first `Expand all` in the DOM (for Progress Updates) and clicked that instead of the specific `Expand` for the step requiring input. Added a prioritized `findRequiresInputExpand()` phase that locates the "requires input" element and clicks ONLY the Expand within that section.
+- **Critical: isGenerating() False Positive** — The Stop ■ button in the Antigravity IDE input bar is always present in the DOM (even during the "Waiting.." state). `isGenerating()` detected it and returned `true`, blocking ALL button detection. Added visibility checks (`offsetParent`, `display`, `visibility`, `opacity`, `disabled`, `getBoundingClientRect`) — only visible and active stop buttons now trigger the guard.
+- **Robust Click Dispatch** — Replaced simple `btn.click()` with full `pointerdown → mousedown → pointerup → mouseup → click` sequence with real coordinates (`getBoundingClientRect`). React/Preact components in the Antigravity IDE might intercept `mousedown`/`pointerdown` instead of `click`, causing silently ignored clicks.
 
 ## [1.7.8] - 2026-03-25
 
 ### Fixed
-- **Critical: Chrome Port Conflict** — Root cause del problema intermittente "smette di funzionare". Chrome (o altri browser) poteva occupare la porta 9222, impedendo all'IDE Antigravity di bindare la propria porta di debug. L'estensione trovava i target Chrome invece dei webview dell'agente, risultando in "CDP Status: Disconnected" e zero click.
-- **Dedicated Port 9333**: L'estensione ora usa la porta 9333 come porta primaria, dedicata esclusivamente ad Antigravity. La porta 9222 resta come fallback ma con conflict detection.
-- **Port Conflict Detection**: `checkAndFixCDP()` ora verifica se la porta 9222 è occupata da Chrome (analizzando gli URL dei target: `vscode-webview://` = Antigravity, `http://` = Chrome) e mostra un warning specifico con opzione auto-fix.
-- **Shortcut Migration**: Il patcher Windows ora migra automaticamente i shortcut dalla vecchia porta 9222 alla nuova 9333, senza creare duplicati del flag.
+- **Critical: Chrome Port Conflict** — Root cause of the intermittent "stops working" issue. Chrome (or other browsers) could occupy port 9222, preventing the Antigravity IDE from binding its debug port. The extension found Chrome targets instead of the agent webviews, resulting in "CDP Status: Disconnected" and zero clicks.
+- **Dedicated Port 9333**: The extension now uses port 9333 as its primary port, dedicated exclusively to Antigravity. Port 9222 remains as a fallback but with conflict detection.
+- **Port Conflict Detection**: `checkAndFixCDP()` now verifies if port 9222 is occupied by Chrome (analyzing target URLs: `vscode-webview://` = Antigravity, `http://` = Chrome) and shows a specific warning with an auto-fix option.
+- **Shortcut Migration**: The Windows patcher now automatically migrates shortcuts from the old port 9222 to the new 9333, without duplicating the flag.
 
 ## [1.7.7] - 2026-03-25
 
 ### Fixed
-- **Critical: Immortal Polling Loops** (`runVsCodePolling`, `runCdpPolling`): Entrambi i loop di polling ricorsivi ora sono wrappati in try/catch esterno. Precedentemente, qualsiasi eccezione non gestita (es. errore nella lettura della config, crash inatteso in `checkPermissionButtons`) uccideva silenziosamente la catena `setTimeout` — il polling si fermava per sempre ma la status bar mostrava ancora "Auto: ON". **Questa era la causa principale del "smette di funzionare senza motivo".**
-- **CDP Startup Retry** (`cdpStartupCheck`): L'estensione ora ritenta la connessione CDP fino a 5 volte con backoff crescente (3s, 6s, 9s, 12s, 15s) all'avvio. Precedentemente, se la porta debug non era pronta al momento dell'attivazione (IDE in caricamento, reload lento), l'estensione restava morta fino a toggle manuale.
-- **WebSocket CONNECTING→CLOSED Race** (`cdpEvaluate`): Aggiunta gestione esplicita per WebSocket che falliscono durante la fase CONNECTING senza mai raggiungere OPEN. L'handler `once('error')`/`once('close')` sulla Promise path risolve immediatamente con `null` e pulisce il pool, invece di aspettare il timeout di 1500ms.
+- **Critical: Immortal Polling Loops** (`runVsCodePolling`, `runCdpPolling`): Both recursive polling loops are now wrapped in an outer try/catch. Previously, any unhandled exception (e.g. error reading config, unexpected crash in `checkPermissionButtons`) silently killed the `setTimeout` chain — polling stopped forever but the status bar still showed "Auto: ON". **This was the main cause of the "stops working for no reason" issue.**
+- **CDP Startup Retry** (`cdpStartupCheck`): The extension now retries the CDP connection up to 5 times with increasing backoff (3s, 6s, 9s, 12s, 15s) at startup. Previously, if the debug port was not ready upon activation (IDE loading, slow reload), the extension remained dead until manually toggled.
+- **WebSocket CONNECTING→CLOSED Race** (`cdpEvaluate`): Added explicit handling for WebSockets failing during the CONNECTING phase without ever reaching OPEN. The `once('error')`/`once('close')` handler on the Promise path immediately resolves with `null` and cleans the pool, instead of waiting for the 1500ms timeout.
 
 ### Removed
-- **Dead Code Cleanup**: Rimosse le funzioni `cdpSendMulti()` e `clickBannerViaDom()` (~120 righe) che non erano chiamate da nessuna parte nel codice attivo. Queste funzioni creavano WebSocket non pooled che potevano confliggere con il pool principale (CDP permette una sola connessione per target).
+- **Dead Code Cleanup**: Removed `cdpSendMulti()` and `clickBannerViaDom()` functions (~120 lines) that were unused in the active codebase. These functions created non-pooled WebSockets that could conflict with the main pool (CDP allows only one connection per target).
 
 ## [1.7.6] - 2026-03-23
 
 ### Fixed
-- **Critical: CDP Mutex Deadlock Fix** (`isCheckingCDP`): Spostato il rilascio della guardia mutex nel blocco `finally{}`. Precedentemente, se `cdpEvaluate()` andava in timeout o un `return` anticipato veniva eseguito, `isCheckingCDP` restava `true` per sempre — bloccando silenziosamente tutto il polling CDP fino al riavvio dell'estensione. **Questa era la causa principale del problema intermittente "smette di funzionare".**
-- **WebSocket Listener Leak**: Aggiunto `removeListener('message')` nel timeout di `cdpEvaluate()`. Precedentemente, listener non rimossi si accumulavano ad ogni chiamata fallita, causando rallentamento progressivo e risposte confuse.
-- **CDP Response Collision**: Sostituito l'ID hardcoded `1` con un contatore incrementale (`nextCdpId++`) per le chiamate `Runtime.evaluate`. Con il pool WebSocket, due chiamate sulla stessa connessione potevano confondere le risposte.
-- **WebSocket Orphan Leak**: Aggiunto `ws.close()` nei handler `error` di `clickBannerViaDom()` e `cdpSendMulti()` per chiudere le connessioni orfane in caso di errore.
-- **Deactivation Cleanup**: La funzione `deactivate()` ora chiude tutte le connessioni WebSocket nel pool e svuota la Map, prevenendo leak post-reload.
-- **Log Rotation**: Implementata rotazione automatica del file di log quando supera 1 MB, prevenendo crescita infinita del file su disco.
+- **Critical: CDP Mutex Deadlock Fix** (`isCheckingCDP`): Moved the mutex guard release to the `finally{}` block. Previously, if `cdpEvaluate()` timed out or an early `return` was executed, `isCheckingCDP` remained `true` forever — silently blocking all CDP polling until the extension restarted. **This was a major cause of the intermittent "stops working" issue.**
+- **WebSocket Listener Leak**: Added `removeListener('message')` in the `cdpEvaluate()` timeout. Previously, unremoved listeners accumulated on each failed call, causing progressive slowdown and mixed responses.
+- **CDP Response Collision**: Replaced the hardcoded ID `1` with an incremental counter (`nextCdpId++`) for `Runtime.evaluate` calls. With the WebSocket pool, two calls on the same connection could mix up responses.
+- **WebSocket Orphan Leak**: Added `ws.close()` in the `error` handlers for `clickBannerViaDom()` and `cdpSendMulti()` to close orphaned connections in case of error.
+- **Deactivation Cleanup**: The `deactivate()` function now closes all WebSocket connections in the pool and clears the Map, preventing post-reload leaks.
+- **Log Rotation**: Implemented automatic log file rotation when exceeding 1 MB, preventing infinite growth on disk.
 
 ## [1.7.5] - 2026-03-14
 
 ### Fixed
-- **Permission Prompt Loop Fix**: Risolto problema dove i prompt di permesso (come "Allow Once" per l'accesso alle cartelle) smettevano di essere cliccati dopo il primo tentativo fallito. Questi pulsanti sono ora esenti dal tagging anti-duplicato e vengono ri-cliccati finché il prompt non scompare.
+- **Permission Prompt Loop Fix**: Fixed an issue where permission prompts (such as "Allow Once" for folder access) stopped being clicked after the first failed attempt. These buttons are now exempt from anti-duplicate tagging and will be clicked again until the prompt disappears.
 
 ## [1.7.4] - 2026-03-14
 
 ### Fixed
-- **Expand Button Stuck on "Waiting.."**: Risolto bug critico dove il pulsante "Expand" nella barra "1 Step Requires Input" non veniva cliccato perché il meccanismo di tagging anti-duplicato (`data-ag-clicked`) lo bloccava quando il fingerprint dell'output dell'AI non cambiava. I pulsanti expand, collapse, requires input e changes overview sono ora esenti dal tagging e possono essere ri-cliccati liberamente.
-- **Anchor Tag Detection**: Migliorato `closestClickable` per riconoscere anche elementi `<a>` come target cliccabili, coprendo strutture DOM alternative della UI Gemini.
+- **Expand Button Stuck on "Waiting.."**: Fixed a critical bug where the "Expand" button in the "1 Step Requires Input" bar was not clicked because the anti-duplicate tagging mechanism (`data-ag-clicked`) blocked it when the AI output fingerprint didn't change. Expand, collapse, requires input, and changes overview buttons are now exempt from tagging and can be freely re-clicked.
+- **Anchor Tag Detection**: Improved `closestClickable` to recognize `<a>` elements as clickable targets, covering alternative DOM structures of the Gemini UI.
 
 ## [1.7.3] - 2026-03-14
 
 ### Fixed
-- **CDP Stability**: Corretti bug critici `cdpAttempted` e `watchdogTimer` (ReferenceError) che causavano crash silenziosi del loop di polling.
-- **Enhanced Expansion**: Aggiunto supporto completo per i pulsanti "Expand all", "Collapse all" e le varianti italiane nell'interfaccia dell'agente.
-- **Robust Text Matching**: Implementata la normalizzazione del testo per gestire icone SVG annidate e spazi multipli nei pulsanti.
-- **Anti-Loop Calibration**: Aggiornate le soglie di tolleranza per i nuovi pulsanti di espansione per prevenire attivazioni errate della modalità Standby.
+- **CDP Stability**: Fixed critical `cdpAttempted` and `watchdogTimer` (ReferenceError) bugs that caused silent crashes of the polling loop.
+- **Enhanced Expansion**: Added full support for "Expand all", "Collapse all", and their Italian variants in the agent interface.
+- **Robust Text Matching**: Implemented text normalization to handle nested SVG icons and multiple spaces inside buttons.
+- **Anti-Loop Calibration**: Updated tolerance thresholds for the new expansion buttons to prevent erroneous Standby mode activations.
 
 ## [1.7.2] - 2026-03-14
 
 ### Added
-- **Overtaker Mode**: Implementato pool di WebSocket persistenti (Caching) per azzerare la latenza di handshake CDP.
-- **Proactive Auto-Click**: Aggiunto supporto per il pulsante "Changes Overview" (Panoramica modifiche), eliminando un noto punto di stallo manuale dell'IDE.
+- **Overtaker Mode**: Implemented a persistent WebSocket pool (Caching) to eliminate CDP handshake latency.
+- **Proactive Auto-Click**: Added support for the "Changes Overview" button, eliminating a known manual stall point in the IDE.
 
 ## [1.7.1] - 2026-03-14
-- **Zero-Focus-Theft**: Protezione nativa degli eventi di focus per impedire a VS Code di interferire durante l'automazione.
-- **Button Tagging**: Implementata la marcatura degli elementi DOM (`data-ag-clicked`) per prevenire click duplicati con precisione chirurgica.
-- **Rich Dashboard**: Il tooltip della StatusBar ora mostra statistiche in tempo reale, stato della connessione CDP e cronologia azioni.
-- **Audit Mode**: Nuova modalità "Dry-run" per testare l'automazione senza eseguire click reali (Toggle via `autorunpro.toggleAudit`).
-- **Button Census**: Nuovo comando diagnostico per elencare tutti i pulsanti cliccabili trovati nel pannello dell'Agente.
+- **Zero-Focus-Theft**: Native focus event protection to prevent VS Code from interfering during automation.
+- **Button Tagging**: Implemented DOM element tagging (`data-ag-clicked`) to prevent duplicate clicks with surgical precision.
+- **Rich Dashboard**: The StatusBar tooltip now displays real-time statistics, CDP connection status, and action history.
+- **Audit Mode**: New "Dry-run" mode to test automation without executing real clicks (Toggle via `autorunpro.toggleAudit`).
+- **Button Census**: New diagnostic command to list all clickable buttons found in the Agent panel.
 
 ## [1.6.9] - 2026-03-14
 
 ## [1.6.7] - 2026-03-13
 
 ### Fixed
-- **Anti-Loop Optimization (Always Run)**: Aumentata la soglia di tolleranza per i pulsanti "Always Run" e "Esegui sempre" a 30 click (come per il pulsante Expand), riducendo i falsi positivi di standby durante le operazioni repetitive.
-- **Diagnostics**: Corretta la stringa di versione riportata nei log diagnostici.
+- **Anti-Loop Optimization (Always Run)**: Increased the tolerance threshold for the "Always Run" and "Esegui sempre" buttons to 30 clicks (same as the Expand button), reducing false positive standbys during repetitive operations.
+- **Diagnostics**: Fixed the version string reported in diagnostic logs.
 
 ## [1.6.6] - 2026-03-11
 
 ### Fixed
-- **Anti-Loop Optimization (Expand/Espandi)**: Aumentate drasticamente le soglie di tolleranza per i pulsanti di espansione dell'interfaccia. Precedentemente, il sistema poteva entrare in STANDBY erroneamente perché il click su "Expand" non cambiava il contenuto del messaggio (fingerprint), venendo scambiato per un loop. Ora questi pulsanti hanno soglie dedicate molto più alte.
+- **Anti-Loop Optimization (Expand/Espandi)**: Drastically increased the tolerance thresholds for interface expansion buttons. Previously, the system could incorrectly enter STANDBY because clicking "Expand" didn't change the message content (fingerprint), being mistaken for a loop. Now these buttons have much higher dedicated thresholds.
 
 ---
 
 ## [1.6.5] - 2026-03-11
 
 ### Fixed
-- **Anti-Loop Dynamics**: Corretto il bug dove lo standby si attivava ingiustamente durante una serie di operazioni rapide ma valide. Ora i contatori vengono resettati istantaneamente ad ogni nuovo output dell'AI.
-- **Tolleranza elevata**: Aumentate ulteriormente le soglie di rilevamento (15 click / 10 fingerprint) per garantire la massima fluidità.
+- **Anti-Loop Dynamics**: Fixed the bug where standby was unfairly activated during a series of rapid but valid operations. Now counters are reset instantly with every new AI output.
+- **High Tolerance**: Further increased detection thresholds (15 clicks / 10 fingerprints) to ensure maximum fluidity.
 
 ---
 
@@ -130,94 +137,94 @@
 ## [1.6.1] - 2026-03-11
 
 ### Fixed
-- **Hash Deterministico (Robust Loop Detection)**: Sostituito il confronto parziale del testo con una funzione di hashing deterministica (`djb2`) per identificare con precisione millimetrica l'output ripetuto dell'AI.
-- **Exponential Backoff Reale**: Il sistema di attesa dopo i click ora segue una progressione esponenziale reale (3s, 6s, 12s, 24s... fino a 60s) invece che lineare, garantendo un freno molto più efficace in caso di loop.
-- **Selettori UI con Fallback Chain**: Introdotta una catena di selettori DOM multipli per individuare l'output dell'assistente, rendendo l'estensione resiliente ai futuri cambiamenti dell'interfaccia di Antigravity.
-- **Logging Metadati Avanzato**: I log ora includono il fingerprint dell'output, il livello di backoff raggiunto e il selettore DOM utilizzato con successo.
+- **Deterministic Hash (Robust Loop Detection)**: Replaced partial text comparison with a deterministic hashing function (`djb2`) to identify repeated AI output with pinpoint accuracy.
+- **Real Exponential Backoff**: The post-click wait system now follows a real exponential progression (3s, 6s, 12s, 24s... up to 60s) instead of linear, providing a much more effective brake in case of loops.
+- **UI Selectors with Fallback Chain**: Introduced a chain of multiple DOM selectors to locate the assistant's output, making the extension resilient to future Antigravity interface changes.
+- **Advanced Metadata Logging**: Logs now include the output fingerprint, the achieved backoff level, and the successfully used DOM selector.
 
 ---
 
 ## [1.6.0] - 2026-03-11
 
 ### Added
-- **Kill Switch / Lockdown Mode**: L'estensione si disabilita automaticamente se rileva un picco anomalo di operazioni (es. > 20 click in 2 minuti) per prevenire ban da parte delle API esterne.
-- **Debouncing e Cooldown Progressivo (Exponential Backoff)**: Ogni azione critica instaura un blocco temporale. In caso di loop su errori ripetuti, il tempo di attesa tra un click e l'altro aumenta progressivamente (+2 secondi a ogni iterazione continua).
-- **Rilevamento Loop dell'Output AI (Hash check)**: Ora l'estensione estrae un frammento del testo generato dall'Agente (AI output snippet). Se l'Agente è in loop logico e propone la stessa soluzione errata per più di 3 volte, l'automazione blocca la chat in Standby prima di esaurire l'account.
-- **Logging Diagnostico Avanzato**: Inclusione del conteggio retry e cooldown previsti all'interno di `autorun_pro.log` per semplificare il debug.
+- **Kill Switch / Lockdown Mode**: The extension automatically disables itself if it detects an abnormal peak of operations (e.g. > 20 clicks in 2 minutes) to prevent bans from external APIs.
+- **Debouncing and Progressive Cooldown (Exponential Backoff)**: Every critical action instigates a time block. In case of loops on repeated errors, the wait time between one click and the next progressively increases (+2 seconds at each continuous iteration).
+- **AI Output Loop Detection (Hash check)**: The extension now extracts a fragment of the text generated by the Agent (AI output snippet). If the Agent is in a logical loop and proposes the same flawed solution more than 3 times, automation halts the chat in Standby before exhausting the account.
+- **Advanced Diagnostic Logging**: Includes retry counts and expected cooldowns inside `autorun_pro.log` to simplify debugging.
 
 ---
 
 ## [1.5.9] - 2026-03-11
 
 ### Added
-- Introduzione del controllo dello stato UI: l'estensione ora verifica se l'agente sta attivamente generando testo ("generating") ed evita i loop di click in quella fase.
-- Randomizzazione (Jitter) degli intervalli di polling (`setTimeout` casuali invece di `setInterval` fissi) per eludere meccanismi di rilevazione anti-bot ed evitare i blocchi account.
+- Introduced UI state checking: the extension now verifies if the agent is actively generating text ("generating") and prevents click loops during that phase.
+- Randomized (Jitter) polling intervals (random `setTimeout` instead of fixed `setInterval`) to evade anti-bot detection mechanisms and avoid account blocks.
 
 ---
 
 ## [1.5.8] - 2026-03-09
 
 ### Changed
-- Eseguito test dell'estensione confermando il corretto funzionamento (auto-accept per file e auto-run per terminale).
-- Aggiornato file di test interno (`test_auto_accept.txt`).
+- Executed extension test confirming correct functionality (auto-accept for files and auto-run for terminal).
+- Updated internal test file (`test_auto_accept.txt`).
 
 ---
 
 ## [1.5.7] - 2026-03-04
 
 ### Added
-- Introduzione del comando `AntiGravity Auto Run Pro: Open Log File` per aprire il file di log in VS Code.
-- Aggiunto timer Watchdog di 10 secondi per ripristinare il polling CDP in caso di timeout/blocco anomalo della comunicazione WebSocket col browser.
-- Aggiunto contributo comando `autorunpro.openLog` in `package.json`.
+- Introduced the `AntiGravity Auto Run Pro: Open Log File` command to open the log file in VS Code.
+- Added a 10-second Watchdog timer to restore CDP polling in case of anomalous timeout/block of WebSocket communication with the browser.
+- Added `autorunpro.openLog` command contribution in `package.json`.
 
 ### Changed
-- Migliorato il sistema di logging: ora il file log viene salvato centralmente nella `globalStorage` dell'estensione (non più inquinando la home o il workspace corrente).
+- Improved logging system: the log file is now saved centrally in the extension's `globalStorage` (no longer polluting the home or current workspace).
 
 ---
 
 ## [1.5.6] - 2026-03-03
 
 ### Fixed
-- Corretto bug nel ciclo di scansione CDP: ora l'estensione analizza correttamente tutte le pagine webview aperte invece di fermarsi alla prima (risolto il problema del mancato riconoscimento di "Accept all" nel pannello chat).
-- Migliorato il riconoscimento del bottone `Accept all` per le modifiche ai file nei Chat Edits (riconoscimento di span isolati).
-- Aggiornate le stringhe di versione interne per coerenza.
+- Fixed bug in the CDP scanning cycle: the extension now correctly analyzes all open webview pages instead of stopping at the first one (resolved the failure to recognize "Accept all" in the chat panel).
+- Improved recognition of the `Accept all` button for file modifications in Chat Edits (recognition of isolated spans).
+- Updated internal version strings for consistency.
 
 ### Added
-- Introdotto il logging su file (`autorun_pro.log`) per facilitare la diagnosi dei problemi senza dover aprire il canale di output di VS Code.
+- Introduced file logging (`autorun_pro.log`) to facilitate troubleshooting without having to open the VS Code output channel.
 
 ---
 
 ## [1.5.5] - 2026-03-02
 ### Changed
-- Sostituita la disattivazione automatica per i loop infiniti con la modalità **STANDBY**: se viene rilevato un loop, l'estensione si mette in pausa (mostrando l'icona 🕒 sulla barra di stato) finché il pulsante bloccato non scompare dall'interfaccia (es. quando l'utente scrive un nuovo prompt nel pannello), riprendendo poi l'esecuzione automaticamente.
+- Replaced automatic deactivation for infinite loops with **STANDBY** mode: if a loop is detected, the extension pauses (showing the 🕒 icon on the status bar) until the stuck button disappears from the interface (e.g. when the user writes a new prompt in the panel), then automatically resuming execution.
 
 ---
 
 ## [1.5.4] - 2026-03-02
 
 ### Added
-- Resa opzionale la protezione anti-loop introdotta nella versione precedente tramite l'impostazione `autorunpro.antiLoopProtection` (attiva di default).
+- Made the anti-loop protection introduced in the previous version optional via the `autorunpro.antiLoopProtection` setting (active by default).
 
 ---
 
 ## [1.5.3] - 2026-03-02
 
 ### Added
-- Aggiunta protezione contro i loop infiniti per i pulsanti CDP: se un pulsante viene ciclicamente premuto senza successo, l'estensione si disattiva da sola dopo 5 tentativi consecutivi ravvicinati.
+- Added protection against infinite loops for CDP buttons: if a button is cyclically pressed without success, the extension deactivates itself after 5 consecutive close attempts.
 
 ---
 
 ## [1.5.2] - 2026-03-02
 
 ### Added
-- Aggiunti screenshot esplicativi alle pagine della Wiki per facilitarne la comprensione tecnica.
+- Added explanatory screenshots to Wiki pages to facilitate technical understanding.
 
 ---
 
 ## [1.5.1] - 2026-03-01
 
 ### Added
-- Supporto per le versioni pre-release (aggiornato `engines.vscode` a `^1.63.0`).
+- Support for pre-release versions (updated `engines.vscode` to `^1.63.0`).
 
 ---
 
@@ -235,11 +242,9 @@
 ## [1.4.2] - 2026-02-26
 
 ### Added
-- Aggiunto logging avanzato degli errori (con anti-spam/throttling) per diagnosticare mancati click CDP e rifiuti dei comandi VS Code
+- Added advanced error logging (with anti-spam/throttling) to diagnose missed CDP clicks and rejected VS Code commands
 
-# Changelog
-
-All notable changes to the **Antigravity Auto Run Pro** extension will be documented in this file.
+---
 
 ## [1.4.1] - 2026-02-26
 
@@ -267,7 +272,6 @@ All notable changes to the **Antigravity Auto Run Pro** extension will be docume
 
 ### Changed
 - Added missing SEO keywords to `package.json` and `README.md` to ensure correct indexing on the VS Marketplace and Open VSX ("auto run command", "auto pilot", "auto accept", "free auto accept agent").
-
 
 ## [1.3.0] - 2026-02-21
 
@@ -301,4 +305,3 @@ All notable changes to the **Antigravity Auto Run Pro** extension will be docume
 - New isolated bundle and command structure to prevent collisions.
 - Integrates all new accept commands for Antigravity IDE v1.18.4+ (`antigravity.terminalCommand.run`, `antigravity.terminalCommand.accept`, etc.).
 - Premium responsive status bar icon and brand new neon lock logo.
-
