@@ -1,7 +1,7 @@
-// AntiGravity AutoAccept v1.8.4 "Priority Run"
+// AntiGravity AutoAccept v1.8.5 "Priority Run Fix"
 // Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
 // Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode, Audit Persistence
-// Fixes v1.8.4: Run/Accept cliccati PRIMA del check isGenerating() — il stop button visibile durante la generazione non blocca più l'approvazione dei comandi terminale
+// Fixes v1.8.5: fingerprint e selectorUsed ora calcolati PRIMA della PRIORITY_PHASE_0 (erano undefined, causando standby prematuro dopo 15 click)
 
 const vscode = require('vscode');
 const http = require('http');
@@ -268,6 +268,16 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
         return hasStreamingIndicator;
     }
 
+    // ═══ FINGERPRINT (calcolato prima di PRIORITY_PHASE_0) ═══
+    // FIX v1.8.5: fingerprint e selectorUsed devono essere calcolati PRIMA della fase
+    // PRIORITY_PHASE_0, altrimenti il loro valore è undefined (var hoisting senza assegnazione).
+    // Con undefined come fingerprint, data-ag-clicked="undefined" veniva scritto ad ogni click,
+    // il secondo ciclo trovava fingerprint===lastAgentFingerprint e consecutiveFingerprintCount
+    // saliva fino allo STANDBY automatico dopo 15 click, bloccando tutta l'estensione.
+    var outputData = getAssistantOutput();
+    var fingerprint = outputData ? getHashCode(outputData.text) : 'no-output';
+    var selectorUsed = outputData ? outputData.selector : 'none';
+
     // ═══ PRIORITY PHASE 0: Run / Accept terminal commands (bypass isGenerating) ═══
     // FIX v1.8.4: Terminal command prompts ("Run echo...?", "Accept all") are PAUSE POINTS
     // that appear while the AI may still be streaming the rest of its response.
@@ -362,10 +372,6 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
         return null;
     }
 
-    var outputData = getAssistantOutput();
-    var fingerprint = outputData ? getHashCode(outputData.text) : 'no-output';
-    var selectorUsed = outputData ? outputData.selector : 'none';
-    
     // ═══ ROBUST CLICK DISPATCH ═══
     // FIX v1.7.9: Dispatch full pointer/mouse event sequence instead of just .click().
     // React/Preact components in Antigravity IDE may listen to mousedown/pointerdown
@@ -542,7 +548,7 @@ function updateStatusBar() {
     
     // Industrial Dashboard Tooltip
     const dashboard = [
-        `Antigravity Auto Run Pro v1.8.4`,
+        `Antigravity Auto Run Pro v1.8.5`,
         `───────────────────────────`,
         `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
         `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
@@ -1097,7 +1103,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.8.4 "Priority Run")');
+    log('Extension activating (v1.8.5 "Priority Run Fix")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);

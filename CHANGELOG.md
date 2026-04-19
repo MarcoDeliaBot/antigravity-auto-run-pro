@@ -2,7 +2,13 @@
 
 All notable changes to the **Antigravity Auto Run Pro** extension will be documented in this file.
 
+## [1.8.5] - 2026-04-19
+
+### Fixed
+- **Critical: Fingerprint `undefined` causes premature STANDBY** — In v1.8.4, the new PRIORITY_PHASE_0 (which checks `run`/`accept` before the `isGenerating()` guard) used `fingerprint` and `selectorUsed` before they were calculated. Due to JavaScript `var` hoisting, their value was `undefined` at the point of use. Every click wrote `data-ag-clicked="undefined"` on the button; on the very next polling cycle `fingerprint` was still `"undefined"`, matching `lastAgentFingerprint`, so `consecutiveFingerprintCount` incremented every 1.5 s and hit the 15-click STANDBY threshold in ~22 seconds. The extension silently stopped clicking after the first 15 Run/Accept presses. Fix: moved `outputData`, `fingerprint`, and `selectorUsed` calculations to immediately **before** the PRIORITY_PHASE_0 loop.
+
 ## [1.8.4] - 2026-04-19
+
 
 ### Fixed
 - **Critical: Run/Accept buttons bypass `isGenerating()` guard** — When Antigravity IDE shows a terminal command prompt ("Run echo...?"), the AI stop button is still visible while it finishes streaming the rest of the response. This caused `isGenerating()` to return `true`, blocking ALL button detection and leaving the Run prompt hanging. `run`, `accept`, `esegui`, and `accetta` buttons are now checked in a dedicated **Priority Phase 0** that runs BEFORE the generating guard — they represent explicit user-approval gates, not mid-generation UI noise.
