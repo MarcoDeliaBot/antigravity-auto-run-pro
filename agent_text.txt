@@ -1,0 +1,42 @@
+Agent Manager
+Recent
+windows
+\windows
+antigravity-auto-run-pro
+c:\Users\Marco\Desktop\antigravity\estensions\antigravity-auto-run-pro
+trapianto-capelli-roma.com
+c:\Users\Marco\Desktop\antigravity\website\trapianto-capelli-roma.com
+Idraulicovicinoameroma.it
+c:\Users\Marco\Desktop\antigravity\website\Idraulicovicinoameroma.it
+clinicautotrapianto.it
+c:\Users\Marco\Desktop\antigravity\website\clinicautotrapianto.it
+dizione-neutra
+c:\Users\Marco\Desktop\antigravity\App\dizione-neutra
+disotturazionimilano.com
+c:\Users\Marco\Desktop\antigravity\website\disotturazionimilano.com
+Dizione-Neutra
+c:\Users\Marco\Desktop\antigravity\App\dizione-neutra\Dizione-Neutra
+idraulicoroma.eu
+c:\Users\Marco\Desktop\antigravity\website\idraulicoroma.eu
+idraulicomilano.me
+c:\Users\Marco\Desktop\antigravity\website\idraulicomilano.me
+idraulico-roma.com
+c:\Users\Marco\Desktop\antigravity\website\idraulico-roma.com
+autospurgoroma.me
+c:\Users\Marco\Desktop\antigravity\website\autospurgoroma.me
+Boards
+c:\Users\Marco\Desktop\antigravity\App\Boards
+Google ADS
+c:\Users\Marco\Desktop\antigravity\doc\Google ADS
+Prompt-Optimizer
+c:\Users\Marco\Desktop\antigravity\estensions\Prompt-Optimizer
+node_modules
+c:\Users\Marco\.antigravity\extensions\marcodelia.antigravity-auto-run-pro-1.0.0\node_modules
+autoincidentate.it
+c:\Users\Marco\Desktop\antigravity\website\autoincidentate.it
+TaskCloud
+c:\Users\Marco\Desktop\antigravity\App\TaskCloud
+compare_arrows
+to navigate
+keyboard_return
+to select

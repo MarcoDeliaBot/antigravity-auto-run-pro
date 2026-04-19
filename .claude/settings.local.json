@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx vsce *)",
+      "WebSearch",
+      "WebFetch(domain:antigravity.google)",
+      "WebFetch(domain:releasebot.io)",
+      "WebFetch(domain:discuss.ai.google.dev)",
+      "Bash(git log *)"
+    ]
+  }
+}

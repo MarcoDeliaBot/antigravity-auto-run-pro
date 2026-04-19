@@ -1,0 +1,1129 @@
+[
+  {
+    "tag": "DIV",
+    "classes": "menubar-menu-button",
+    "textContent": "File",
+    "ariaLabel": "File",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "menubar-menu-button",
+    "textContent": "Edit",
+    "ariaLabel": "Edit",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "menubar-menu-button",
+    "textContent": "Selection",
+    "ariaLabel": "Selection",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "menubar-menu-button",
+    "textContent": "View",
+    "ariaLabel": "View",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "menubar-menu-button",
+    "textContent": "Go",
+    "ariaLabel": "Go",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "menubar-menu-button",
+    "textContent": "Run",
+    "ariaLabel": "Run",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "menubar-menu-button",
+    "textContent": "Terminal",
+    "ariaLabel": "Terminal",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "menubar-menu-button",
+    "textContent": "Help",
+    "ariaLabel": "Help",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "menubar-menu-button",
+    "textContent": "",
+    "ariaLabel": "More",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "open-agent-manager-button",
+    "textContent": "Open Agent Manager",
+    "ariaLabel": null,
+    "title": "Open Agent Manager (Ctrl+E)"
+  },
+  {
+    "tag": "SPAN",
+    "classes": "button-text",
+    "textContent": "Open Agent Manager",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-configure-layout-icon",
+    "textContent": "",
+    "ariaLabel": "Customize Layout...",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label disabled codicon codicon-code",
+    "textContent": "",
+    "ariaLabel": "Open in Cider",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label disabled codicon codicon-refresh",
+    "textContent": "",
+    "ariaLabel": "Reload Window",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-search",
+    "textContent": "",
+    "ariaLabel": "Quick Open",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-chrome",
+    "textContent": "",
+    "ariaLabel": "Open Browser (Preview)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-gear",
+    "textContent": "",
+    "ariaLabel": "Editor-Specific Settings",
+    "title": null
+  },
+  {
+    "tag": "LI",
+    "classes": "action-item icon antigravity-profile",
+    "textContent": "",
+    "ariaLabel": "Profile",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-nudge-button actionable",
+    "textContent": "Log in",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-nudge-button",
+    "textContent": "None",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-nudge-button dismissible",
+    "textContent": "View Changelog",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "SPAN",
+    "classes": "dismiss-button codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": null,
+    "title": "Dismiss"
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-toolbar-more",
+    "textContent": "",
+    "ariaLabel": "Views and More Actions...",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "pane-header expanded",
+    "textContent": "antigravity-auto-run-pro",
+    "ariaLabel": "Explorer Section: antigravity-auto-run-pro",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-new-file",
+    "textContent": "",
+    "ariaLabel": "New File...",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-new-folder",
+    "textContent": "",
+    "ariaLabel": "New Folder...",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-refresh",
+    "textContent": "",
+    "ariaLabel": "Refresh Explorer",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-collapse-all",
+    "textContent": "",
+    "ariaLabel": "Collapse Folders in Explorer",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "monaco-icon-label file-icon antigravity-auto-run-pro-name-dir-icon all_buttons_workbench.json-name-file-icon name-file-icon json-ext-file-icon ext-file-icon json-lang-file-icon explorer-item monaco-decoration-itemColor--ec98p9 monaco-decoration-itemBadge--ec98p9 monaco-decoration-iconBadge--ec98p9",
+    "textContent": "all_buttons_workbench.json",
+    "ariaLabel": "C:\\Users\\Marco\\Desktop\\antigravity\\estensions\\antigravity-auto-run-pro\\all_buttons_workbench.json • Untracked",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "monaco-icon-label file-icon antigravity-auto-run-pro-name-dir-icon cdp_dump_all_buttons.js-name-file-icon name-file-icon js-ext-file-icon ext-file-icon javascript-lang-file-icon explorer-item monaco-decoration-itemColor--ec98p9 monaco-decoration-itemBadge--ec98p9 monaco-decoration-iconBadge--ec98p9",
+    "textContent": "cdp_dump_all_buttons.js",
+    "ariaLabel": "C:\\Users\\Marco\\Desktop\\antigravity\\estensions\\antigravity-auto-run-pro\\cdp_dump_all_buttons.js • Untracked",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "monaco-icon-label file-icon antigravity-auto-run-pro-name-dir-icon cdp_query_buttons_all.js-name-file-icon name-file-icon js-ext-file-icon ext-file-icon javascript-lang-file-icon explorer-item monaco-decoration-itemColor--ec98p9 monaco-decoration-itemBadge--ec98p9 monaco-decoration-iconBadge--ec98p9",
+    "textContent": "cdp_query_buttons_all.js",
+    "ariaLabel": "C:\\Users\\Marco\\Desktop\\antigravity\\estensions\\antigravity-auto-run-pro\\cdp_query_buttons_all.js • Untracked",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "monaco-icon-label file-icon antigravity-auto-run-pro-name-dir-icon cdp_query_buttons.js-name-file-icon name-file-icon js-ext-file-icon ext-file-icon javascript-lang-file-icon explorer-item monaco-decoration-itemColor--ec98p9 monaco-decoration-itemBadge--ec98p9 monaco-decoration-iconBadge--ec98p9",
+    "textContent": "cdp_query_buttons.js",
+    "ariaLabel": "C:\\Users\\Marco\\Desktop\\antigravity\\estensions\\antigravity-auto-run-pro\\cdp_query_buttons.js • Untracked",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "pane-header",
+    "textContent": "Outline",
+    "ariaLabel": "Outline Section",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-collapse-all",
+    "textContent": "",
+    "ariaLabel": "Collapse All",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-toolbar-more",
+    "textContent": "",
+    "ariaLabel": "More Actions...",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "pane-header timeline-view",
+    "textContent": "Timeline",
+    "ariaLabel": "Timeline Section",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-timeline-pin",
+    "textContent": "",
+    "ariaLabel": "Pin the Current Timeline",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-timeline-refresh",
+    "textContent": "",
+    "ariaLabel": "Refresh",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-timeline-filter",
+    "textContent": "",
+    "ariaLabel": "Filter Timeline",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-toolbar-more",
+    "textContent": "",
+    "ariaLabel": "More Actions...",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "monaco-icon-label file-icon antigravity-auto-run-pro-name-dir-icon cdp_dump_all_buttons.js-name-file-icon name-file-icon js-ext-file-icon ext-file-icon javascript-lang-file-icon tab-label tab-label-has-badge monaco-decoration-itemColor--ec98p9 monaco-decoration-itemBadge--ec98p9 monaco-decoration-iconBadge--ec98p9",
+    "textContent": "cdp_dump_all_buttons.js",
+    "ariaLabel": "C:\\Users\\Marco\\Desktop\\antigravity\\estensions\\antigravity-auto-run-pro\\cdp_dump_all_buttons.js • Untracked",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "monaco-icon-label file-icon antigravity-auto-run-pro-name-dir-icon cdp_query_buttons_all.js-name-file-icon name-file-icon js-ext-file-icon ext-file-icon javascript-lang-file-icon tab-label tab-label-has-badge monaco-decoration-itemColor--ec98p9 monaco-decoration-itemBadge--ec98p9 monaco-decoration-iconBadge--ec98p9",
+    "textContent": "cdp_query_buttons_all.js",
+    "ariaLabel": "C:\\Users\\Marco\\Desktop\\antigravity\\estensions\\antigravity-auto-run-pro\\cdp_query_buttons_all.js • Untracked",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "monaco-icon-label file-icon antigravity-auto-run-pro-name-dir-icon cdp_query_buttons.js-name-file-icon name-file-icon js-ext-file-icon ext-file-icon javascript-lang-file-icon tab-label tab-label-has-badge monaco-decoration-itemColor--ec98p9 monaco-decoration-itemBadge--ec98p9 monaco-decoration-iconBadge--ec98p9",
+    "textContent": "cdp_query_buttons.js",
+    "ariaLabel": "C:\\Users\\Marco\\Desktop\\antigravity\\estensions\\antigravity-auto-run-pro\\cdp_query_buttons.js • Untracked",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-close",
+    "textContent": "",
+    "ariaLabel": "Close (Ctrl+F4)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-split-horizontal",
+    "textContent": "",
+    "ariaLabel": "Split Editor Right (Ctrl+\\)\n[Alt] Split Editor Down",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-arrow-left",
+    "textContent": "",
+    "ariaLabel": "Go Back (Alt+LeftArrow)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-arrow-right",
+    "textContent": "",
+    "ariaLabel": "Go Forward (Alt+RightArrow)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-toolbar-more",
+    "textContent": "",
+    "ariaLabel": "More Actions...",
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "select-none text-sm font-medium transition-colors cursor-pointer bg-primary text-primary-foreground rounded px-3 py-1 hover:bg-primary-hover disabled:cursor-auto disabled:bg-secondary disabled:text-secondary-foreground disabled:opacity-50 text-sm !px-2 py-0.5",
+    "textContent": "Submit",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "select-none rounded px-2 py-1 text-sm font-medium transition-colors cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary-hover text-xs rounded-md whitespace-nowrap !px-1.5 py-1 mr-2",
+    "textContent": "Reviewkeyboard_arrow_down",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-panel-close",
+    "textContent": "",
+    "ariaLabel": "Hide Panel (Ctrl+J)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-auxiliarybar-maximize",
+    "textContent": "",
+    "ariaLabel": "Maximize Secondary Side Bar Size",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "action-label codicon codicon-auxiliarybar-close",
+    "textContent": "",
+    "ariaLabel": "Hide Secondary Side Bar",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "pane-header expanded hidden",
+    "textContent": "Agent",
+    "ariaLabel": "Agent Section",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "statusbar-item-label",
+    "textContent": "",
+    "ariaLabel": "remote",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "statusbar-item-label",
+    "textContent": "antigravity-auto-run-pro",
+    "ariaLabel": "antigravity-auto-run-pro (Git)",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "statusbar-item-label",
+    "textContent": "main*",
+    "ariaLabel": "antigravity-auto-run-pro (Git) - main*, Checkout Branch/Tag...",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "statusbar-item-label",
+    "textContent": "",
+    "ariaLabel": "antigravity-auto-run-pro (Git) - Synchronize Changes",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "statusbar-item-label",
+    "textContent": "0  0",
+    "ariaLabel": "No Problems",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "statusbar-item-label",
+    "textContent": "",
+    "ariaLabel": "Notifications",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "statusbar-item-label",
+    "textContent": "Antigravity - Settings",
+    "ariaLabel": "Antigravity - Settings",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "statusbar-item-label",
+    "textContent": "GOD",
+    "ariaLabel": "flame  GOD",
+    "title": null
+  },
+  {
+    "tag": "A",
+    "classes": "statusbar-item-label",
+    "textContent": "Auto: STANDBY",
+    "ariaLabel": "clock  Auto: STANDBY, Antigravity Auto Run Pro v1.8.5\n───────────────────────────\nMode: STANDBY\nGod Mode: 🔥 ON\nAudit Mode: OFF\nCDP Status: Connected (Port 9333)\n───────────────────────────\nSession Stats:\n- Total Clicks: 89\n- Last Action: Clicked \"priority-run\"\n- Last Active: 4:47:44 PM\n- Backoff Level: 89\n───────────────────────────\nClick to toggle ON/OFF",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "",
+    "textContent": "",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "cursor-pointer opacity-50 hover:opacity-100 transition-opacity",
+    "textContent": "undo",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color] hidden",
+    "textContent": "Worked for 12m",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Explored1 file, 8 searches",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 2schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 2schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Edited1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 3schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Edited1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 4schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Edited1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Explored1 search",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Edited1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Explored1 search",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 5schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Edited1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 14schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Explored1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Edited1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Explored1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Edited1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Explored1 search",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Edited1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Explored1 file, 1 search",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Edited1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 13schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Edited1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 10schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Explored1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Edited1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Explored1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Edited1 file",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex w-full items-center gap-1.5 px-2 min-h-8 text-left text-sm rounded-lg text-ide-text-color opacity-70 hover:bg-gray-500/10 transition-[background-color] tabular-nums select-none",
+    "textContent": "Thought for 1schevron_right",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "group flex items-center gap-1 w-full text-left text-sm px-2 min-h-8 py-1 rounded-lg tabular-nums select-none text-ide-text-color hover:bg-gray-500/10 transition-[opacity,background-color]",
+    "textContent": "Explored1 file, 4 searches",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm p-1 opacity-50 hover:opacity-100",
+    "textContent": "content_copy",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "absolute -bottom-0 -right-0 z-20 origin-center rounded-full transition-all duration-200 ease-out bg-ide-button-background scale-100 opacity-100 h-2 w-2",
+    "textContent": "",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "absolute -bottom-0 -right-0 z-20 origin-center rounded-full transition-all duration-200 ease-out bg-ide-button-background scale-0 opacity-0 h-2 w-2",
+    "textContent": "",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "absolute -bottom-0 -right-0 z-20 origin-center rounded-full transition-all duration-200 ease-out bg-ide-button-background scale-100 opacity-100 h-2 w-2",
+    "textContent": "",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "absolute -bottom-0 -right-0 z-20 origin-center rounded-full transition-all duration-200 ease-out bg-ide-button-background scale-0 opacity-0 h-2 w-2",
+    "textContent": "",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "rounded px-1 py-0.5 text-xs font-medium",
+    "textContent": "Review Changes",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "p-1.5 rounded-full hover:bg-gray-500/20 cursor-pointer",
+    "textContent": "",
+    "ariaLabel": "Add context",
+    "title": null
+  },
+  {
+    "tag": "DIV",
+    "classes": "",
+    "textContent": "Gemini 3.1 Pro (High)",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "flex min-w-0 max-w-full cursor-pointer items-center h-7 gap-1 rounded-lg pr-1 pl-2 text-xs outline-none hover:bg-gray-500/20 focus-visible:ring-1 focus-visible:ring-gray-500/70",
+    "textContent": "Gemini 3.1 Pro (High)",
+    "ariaLabel": "Select model, current: Gemini 3.1 Pro (High)",
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "px-1 h-6 cursor-pointer",
+    "textContent": "",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "bg-gray-500/20 hover:bg-gray-500/30 w-6 h-6 rounded-full cursor-pointer flex items-center justify-center transition-colors",
+    "textContent": "",
+    "ariaLabel": "Cancel",
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "px-2 py-1 flex w-full items-center justify-between transition-shadow cursor-pointer bg-gray-500/20",
+    "textContent": "Gemini 3.1 Pro (High)New",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "px-2 py-1 flex w-full items-center justify-between transition-shadow cursor-pointer hover:bg-gray-500/10",
+    "textContent": "Gemini 3.1 Pro (Low)New",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "px-2 py-1 flex w-full items-center justify-between transition-shadow cursor-pointer hover:bg-gray-500/10",
+    "textContent": "Gemini 3 Flash",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "px-2 py-1 flex w-full items-center justify-between transition-shadow cursor-pointer hover:bg-gray-500/10",
+    "textContent": "Claude Sonnet 4.6 (Thinking)warning",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "px-2 py-1 flex w-full items-center justify-between transition-shadow cursor-pointer hover:bg-gray-500/10",
+    "textContent": "Claude Opus 4.6 (Thinking)warning",
+    "ariaLabel": null,
+    "title": null
+  },
+  {
+    "tag": "BUTTON",
+    "classes": "px-2 py-1 flex w-full items-center justify-between transition-shadow cursor-pointer hover:bg-gray-500/10",
+    "textContent": "GPT-OSS 120B (Medium)warning",
+    "ariaLabel": null,
+    "title": null
+  }
+]

@@ -1,0 +1,80 @@
+[
+  {
+    "tag": "DIV",
+    "classes": "menubar-menu-button",
+    "textContent": "run",
+    "isButton": false
+  },
+  {
+    "tag": "DIV",
+    "classes": "menubar-menu-title",
+    "textContent": "run",
+    "isButton": false
+  },
+  {
+    "tag": "STRONG",
+    "classes": "",
+    "textContent": "\"run alt+enter\"",
+    "isButton": false
+  },
+  {
+    "tag": "CODE",
+    "classes": "whitespace-pre-wrap",
+    "textContent": "run",
+    "isButton": false
+  },
+  {
+    "tag": "STRONG",
+    "classes": "",
+    "textContent": "\"run alt+enter\"",
+    "isButton": false
+  },
+  {
+    "tag": "CODE",
+    "classes": "whitespace-pre-wrap",
+    "textContent": "'run alt+enter'.startswith('run alt+')",
+    "isButton": false
+  },
+  {
+    "tag": "CODE",
+    "classes": "whitespace-pre-wrap",
+    "textContent": "<button><svg/> run alt+enter</button>",
+    "isButton": false
+  },
+  {
+    "tag": "LI",
+    "classes": "",
+    "textContent": "nodo testo \" run alt+enter\"",
+    "isButton": false
+  },
+  {
+    "tag": "CODE",
+    "classes": "whitespace-pre-wrap",
+    "textContent": "run alt+enter",
+    "isButton": false
+  },
+  {
+    "tag": "SPAN",
+    "classes": "",
+    "textContent": "run",
+    "isButton": false
+  },
+  {
+    "tag": "SPAN",
+    "classes": "",
+    "textContent": "alt+enter\"",
+    "isButton": false
+  },
+  {
+    "tag": "SPAN",
+    "classes": "",
+    "textContent": "alt+enter\"",
+    "isButton": false
+  },
+  {
+    "tag": "SPAN",
+    "classes": "",
+    "textContent": "alt+enter\"",
+    "isButton": false
+  }
+]
