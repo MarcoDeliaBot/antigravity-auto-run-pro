@@ -2,6 +2,11 @@
 
 All notable changes to the **Antigravity Auto Run Pro** extension will be documented in this file.
 
+## [1.8.4] - 2026-04-19
+
+### Fixed
+- **Critical: Run/Accept buttons bypass `isGenerating()` guard** — When Antigravity IDE shows a terminal command prompt ("Run echo...?"), the AI stop button is still visible while it finishes streaming the rest of the response. This caused `isGenerating()` to return `true`, blocking ALL button detection and leaving the Run prompt hanging. `run`, `accept`, `esegui`, and `accetta` buttons are now checked in a dedicated **Priority Phase 0** that runs BEFORE the generating guard — they represent explicit user-approval gates, not mid-generation UI noise.
+
 ## [1.8.3] - 2026-04-19
 
 ### Fixed

@@ -1,7 +1,7 @@
-// AntiGravity AutoAccept v1.8.3 "The Resilient Guard"
+// AntiGravity AutoAccept v1.8.4 "Priority Run"
 // Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
 // Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode, Audit Persistence
-// Fixes v1.8.3: Webview Guard ora multi-layer con button-presence fallback; getDirectText fallback per span interni
+// Fixes v1.8.4: Run/Accept cliccati PRIMA del check isGenerating() — il stop button visibile durante la generazione non blocca più l'approvazione dei comandi terminale
 
 const vscode = require('vscode');
 const http = require('http');
@@ -268,6 +268,30 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
         return hasStreamingIndicator;
     }
 
+    // ═══ PRIORITY PHASE 0: Run / Accept terminal commands (bypass isGenerating) ═══
+    // FIX v1.8.4: Terminal command prompts ("Run echo...?", "Accept all") are PAUSE POINTS
+    // that appear while the AI may still be streaming the rest of its response.
+    // The stop button (visible during streaming) was causing isGenerating()=true, which
+    // blocked ALL button detection and left the Run prompt hanging indefinitely.
+    // These four texts are checked BEFORE the generating guard — they are always safe to click
+    // because they represent explicit user-approval gates, not mid-generation UI noise.
+    var PRIORITY_TEXTS = ['run', 'accept', 'esegui', 'accetta'];
+    for (var p0 = 0; p0 < PRIORITY_TEXTS.length; p0++) {
+        var p0btn = findButton(document.body, PRIORITY_TEXTS[p0]);
+        if (p0btn) {
+            if (STANDBY_BUTTON === PRIORITY_TEXTS[p0]) {
+                return 'standby-present:' + PRIORITY_TEXTS[p0] + '|' + fingerprint + '|' + selectorUsed;
+            }
+            if (p0btn.getAttribute('data-ag-clicked') !== fingerprint) {
+                if (AUDIT_MODE) return 'audit-match:priority-' + PRIORITY_TEXTS[p0] + '|' + fingerprint;
+                robustClick(p0btn);
+                p0btn.setAttribute('data-ag-clicked', fingerprint);
+                p0btn.setAttribute('data-ag-session', SESSION_ID);
+                return 'clicked:priority-' + PRIORITY_TEXTS[p0] + '|' + fingerprint + '|' + selectorUsed;
+            }
+        }
+    }
+
     if (isGenerating()) {
         return 'generating';
     }
@@ -518,7 +542,7 @@ function updateStatusBar() {
     
     // Industrial Dashboard Tooltip
     const dashboard = [
-        `Antigravity Auto Run Pro v1.8.3`,
+        `Antigravity Auto Run Pro v1.8.4`,
         `───────────────────────────`,
         `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
         `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
@@ -1073,7 +1097,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.8.3 "The Resilient Guard")');
+    log('Extension activating (v1.8.4 "Priority Run")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
