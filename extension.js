@@ -1,7 +1,7 @@
-// AntiGravity AutoAccept v1.8.1 "The Silent Fix"
+// AntiGravity AutoAccept v1.8.3 "The Resilient Guard"
 // Primary: Persistent CDP WebSocket engine (Zero-Latency Pool)
 // Features: Zero-Focus-Theft, Element Tagging, Rich Dashboard, Audit Mode, Audit Persistence
-// Fixes v1.8.1: Popup errore CDP mostrato solo una volta; check CDP deferred se ext era OFF
+// Fixes v1.8.3: Webview Guard ora multi-layer con button-presence fallback; getDirectText fallback per span interni
 
 const vscode = require('vscode');
 const http = require('http');
@@ -61,13 +61,38 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
     var GOD_MODE = ${godMode ? 'true' : 'false'};
     var STANDBY_BUTTON = ${standbyButton ? JSON.stringify(standbyButton) : 'null'};
     
-    // ═══ WEBVIEW GUARD ═══
-    if (!document.querySelector('.react-app-container') && 
-        !document.querySelector('[class*="agent"]') &&
-        !document.querySelector('[data-vscode-context]') &&
-        !document.querySelector('.antigravity-agent-side-panel') &&
-        !document.querySelector('[class*="antigravity"]')) {
-        return 'not-agent-panel';
+    // ═══ WEBVIEW GUARD (FIX v1.8.3: Multi-layer) ═══
+    // Layer 1: Specific Antigravity selectors (fast path)
+    var panelDetected = (
+        document.querySelector('.react-app-container') ||
+        document.querySelector('[class*="agent"]') ||
+        document.querySelector('[data-vscode-context]') ||
+        document.querySelector('.antigravity-agent-side-panel') ||
+        document.querySelector('[class*="antigravity"]') ||
+        document.querySelector('[class*="chat"]') ||
+        document.querySelector('[class*="conversation"]') ||
+        document.querySelector('[class*="panel"]')
+    );
+    if (!panelDetected) {
+        // Layer 2: Button-presence fallback — if target buttons exist in this webview,
+        // we ARE in the right panel regardless of CSS class names.
+        // This survives Antigravity DOM updates that change class names.
+        var fallbackFound = false;
+        var fbWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+        var fbNode;
+        while ((fbNode = fbWalker.nextNode())) {
+            var fbTag = (fbNode.tagName || '').toLowerCase();
+            if (fbTag === 'button' || fbNode.getAttribute('role') === 'button') {
+                var fbText = (fbNode.textContent || '').trim().toLowerCase();
+                if (fbText === 'run' || fbText.startsWith('run alt+') || fbText.startsWith('run ctrl+') ||
+                    fbText === 'accept' || fbText.startsWith('accept ') ||
+                    fbText === 'esegui' || fbText.startsWith('esegui alt+')) {
+                    fallbackFound = true;
+                    break;
+                }
+            }
+        }
+        if (!fallbackFound) return 'not-agent-panel';
     }
 
     // ═══ TAGGING & AUDIT MODE ═══
@@ -176,8 +201,13 @@ function buildPermissionScript(customTexts, godMode, standbyButton, auditMode, s
                                   text === 'collapse all' || text === 'comprimi tutto');
             // For short targets like 'run', use DIRECT text only
             // For longer targets or expand targets, allow full textContent as fallback
+            // FIX v1.8.3: For short targets (≤4 chars like 'run'), if directText is empty
+            // (happens when button text is inside a <span> child, not a direct text node),
+            // fall back to fullText only when it is short enough to be a button label (≤40 chars).
+            // This prevents matching "run" inside long text blocks while still catching
+            // <button><span>Run</span> Alt+Enter</button> structures.
             var checkText = (text.length <= 4 && !isExpandTarget)
-                ? directText
+                ? (directText || (fullText.length <= 40 ? fullText : ''))
                 : (directText || fullText.substring(0, 60));
             
             if (textMatches(checkText, text)) {
@@ -488,7 +518,7 @@ function updateStatusBar() {
     
     // Industrial Dashboard Tooltip
     const dashboard = [
-        `Antigravity Auto Run Pro v1.8.1`,
+        `Antigravity Auto Run Pro v1.8.3`,
         `───────────────────────────`,
         `Mode: ${isEnabled ? (isStandby ? 'STANDBY' : 'ACTIVE') : 'OFF'}`,
         `God Mode: ${isGodMode ? '🔥 ON' : '🛡️ Safe'}`,
@@ -1043,7 +1073,7 @@ function applyTemporarySessionRestart() {
 function activate(context) {
     extensionContext = context;
     outputChannel = vscode.window.createOutputChannel('AntiGravity AutoAccept');
-    log('Extension activating (v1.8.1 "The Silent Fix")');
+    log('Extension activating (v1.8.3 "The Resilient Guard")');
 
     // Main toggle status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);

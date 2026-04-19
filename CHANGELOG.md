@@ -2,6 +2,12 @@
 
 All notable changes to the **Antigravity Auto Run Pro** extension will be documented in this file.
 
+## [1.8.3] - 2026-04-19
+
+### Fixed
+- **Webview Guard: Multi-layer detection** — The guard that determines whether the CDP script is running inside the Antigravity agent panel was too strict. It required specific CSS class names (`.react-app-container`, `[class*="antigravity"]`, etc.) which break silently when the Antigravity IDE updates its DOM structure. The guard now has two layers: (1) existing specific selectors as fast path, (2) button-presence fallback that detects actual "Run"/"Accept"/"Esegui" buttons in the webview — making the extension immune to CSS class renames in future IDE versions.
+- **`getDirectText` fallback for `<span>`-wrapped button text** — For short targets like `'run'` (≤4 chars), the extension only inspected direct text nodes of an element, skipping text nested inside child `<span>` elements. If the button is structured as `<button><span>Run</span> Alt+Enter</button>`, `getDirectText(button)` returned an empty string and no match was found. Now falls back to `fullText` when it is short enough (≤40 chars) to safely represent a button label, without risking false positives on longer text blocks.
+
 ## [1.8.2] - 2026-04-12
 
 ### Changed
